@@ -1,9 +1,10 @@
-function Button({ value, className, url }) {
+function Button({ value, className, href, target, onClick }) {
   return (
     <a
-      href={url ? url : "#"}
-      target={"_blank" ? url : "_self"}
+      href={href ? href : "#"}
+      target={target ? target : "_self"}
       className={`flex justify-center items-center rounded px-4 py-2 text-neutral-800 ${className}`}
+      onClick={onClick}
     >
       <span className="font-bold">{value}</span>
     </a>
