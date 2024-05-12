@@ -14,7 +14,7 @@ function Home() {
         <h2 className="text-2xl mb-8 text-white text-shadow shadow-neutral-800 select-none">
           The biggest (and only) halma server with competetive features
         </h2>
-        <Board size="small" />
+        <Board className="w-1/2" />
       </div>
       <div className="flex flex-col p-5 gap-6 justify-center">
         <Button
