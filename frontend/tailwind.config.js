@@ -5,6 +5,15 @@ export default {
   content: ["./index.html", "./src/**/*.{js,jsx}"],
   theme: {
     extend: {
+      width: {
+        "1/16": "6.25%",
+      },
+      height: {
+        "6/7": "85.7412%",
+      },
+      flexBasis: {
+        "1/16": "6.25%",
+      },
       textShadow: {
         sm: "0 1px 2px var(--tw-shadow-color)",
         DEFAULT: "0 2px 4px var(--tw-shadow-color)",
