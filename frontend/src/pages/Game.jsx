@@ -1,5 +1,6 @@
 import Board from "../components/Board";
 import { useEffect, useState } from "react";
+import * as signalR from "@microsoft/signalr";
 
 const staticPieces = {
   player1: [
@@ -53,6 +54,9 @@ function compareArrays(arr1, arr2) {
   return JSON.stringify(arr1) == JSON.stringify(arr2);
 }
 
+const ip = "localhost"
+const port = 8080
+
 function Game() {
   const [pieces, setPieces] = useState({ player1: [], player2: [] });
   const [player, setPlayer] = useState(0);
@@ -60,11 +64,23 @@ function Game() {
   const [dragging, setDragging] = useState(false);
   const [selectedPiece, setSelectedPiece] = useState(null);
   const [selectedField, setSelectedField] = useState(null);
+  const [connection, setConnection] = useState(new signalR.HubConnectionBuilder().withUrl(`http://${ip}:${port}/game`, {
+    skipNegotiation: true,
+    transport: signalR.HttpTransportType.WebSockets
+  }).build());
 
   useEffect(() => {
     setPieces(staticPieces);
     setPlayer(staticPlayer);
     setTurn(staticTurn);
+
+    connection.on("Answer", (param) => {
+      console.log(`Got answer back: ${param}`);
+    });
+
+    connection.start().then(() => {
+      connection.invoke("TestConnection", "Testest");
+    });
   }, []);
 
   const validatePosition = (from, to, turn) => {

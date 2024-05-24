@@ -1,9 +1,16 @@
+using HalmaServer.Hubs;
+using HalmaServer.Services;
+using Microsoft.AspNetCore.SignalR;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddSignalR();
+builder.Services.AddSingleton<GameRepository>();
+builder.Services.AddSingleton<GameService>();
 
 var app = builder.Build();
 
@@ -35,6 +42,8 @@ app.MapGet("/weatherforecast", () =>
 })
 .WithName("GetWeatherForecast")
 .WithOpenApi();
+
+app.MapHub<GameHub>("/game");
 
 app.Run();
 
