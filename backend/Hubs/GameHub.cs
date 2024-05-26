@@ -7,10 +7,18 @@ namespace HalmaServer.Hubs
     public class GameHub(GameService gameService): Hub {
 
         private GameService GameService = gameService;
-        //TODO remove
-        public async Task TestConnection(string param) {
-            Console.WriteLine("Message recieved: " + param);
-            await Clients.Caller.SendAsync("Answer", Context.ConnectionId);
+ 
+        public async Task RequestNewGame(string playerGuid)
+        {
+            var game = GameService.StartGameOrWait(playerGuid, Context.ConnectionId);
+            if (game != null) {
+                var player = game.GetPlayer(playerGuid);
+                var oponnent = game.GetOponnent(playerGuid);
+                await Clients.Client(oponnent.ConnectionId).SendAsync("NewGame", game.GameGuid, game.CanPlayerMove(oponnent.PlayerGuid));
+                await Clients.Caller.SendAsync("NewGame", game.GameGuid, game.CanPlayerMove(player.PlayerGuid));
+            } else {
+                await Clients.Caller.SendAsync("WaitingForGame");
+            }
         }
 
     }

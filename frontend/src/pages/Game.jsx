@@ -1,6 +1,7 @@
 import Board from "../components/Board";
 import { useEffect, useState } from "react";
 import * as signalR from "@microsoft/signalr";
+import { v4 as uuidv4 } from 'uuid';
 
 const staticPieces = {
   player1: [
@@ -64,22 +65,28 @@ function Game() {
   const [dragging, setDragging] = useState(false);
   const [selectedPiece, setSelectedPiece] = useState(null);
   const [selectedField, setSelectedField] = useState(null);
-  const [connection, setConnection] = useState(new signalR.HubConnectionBuilder().withUrl(`http://${ip}:${port}/game`, {
+  const [connection] = useState(new signalR.HubConnectionBuilder().withUrl(`http://${ip}:${port}/game`, {
     skipNegotiation: true,
     transport: signalR.HttpTransportType.WebSockets
   }).build());
+  const [uuid] = useState(uuidv4());
+  const [gameuid, setGameUid] = useState(null);
 
   useEffect(() => {
     setPieces(staticPieces);
     setPlayer(staticPlayer);
     setTurn(staticTurn);
 
-    connection.on("Answer", (param) => {
-      console.log(`Got answer back: ${param}`);
+    connection.on("WaitingForGame", () => {
+      //TODO react accordingly
+    });
+
+    connection.on("NewGame", (gameGuid, myTurn) => {
+      setGameUid(gameGuid);
     });
 
     connection.start().then(() => {
-      connection.invoke("TestConnection", "Testest");
+      connection.invoke("RequestNewGame", uuid);
     });
   }, []);
 
