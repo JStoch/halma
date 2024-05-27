@@ -37,5 +37,31 @@ namespace HalmaServer.Services {
             return player;
         }
 
+        public bool MakeMove(string gameGuid, string playerGuid, List<int> from, List<int> to) {
+            var game = Repository.GetGame(gameGuid);
+
+            if (!game.CanPlayerMove(playerGuid) || from.Count != 2 || to.Count != 2) {
+                return false;
+            }
+
+            var prevX = from[0];
+            var prevY = from[1];
+            var piece = (from movedPiece in game.Pieces
+                where movedPiece.X == prevX && movedPiece.Y == prevY
+                select movedPiece).FirstOrDefault();
+
+            if (piece == null || piece.Owner.PlayerGuid != playerGuid) {
+                return false;
+            }
+
+            Repository.UpdatePiecePosition(piece.PieceId, to[0], to[1], game.GameGuid);
+            game.NextMove();
+            return true;
+        }
+
+        public GameModel GetGame(string gameGuid) {
+            return Repository.GetGame(gameGuid);
+        }
+
     }
 }
