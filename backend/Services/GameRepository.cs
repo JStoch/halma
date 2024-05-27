@@ -6,6 +6,7 @@ namespace HalmaServer.Services {
         //this whole part should be changed
         private List<PlayerModel> Players = [];
         private List<GameModel> Games = [];
+        //TODO add a list of pieces
         //end
 
         public void AddPlayer(PlayerModel player) {
@@ -43,6 +44,31 @@ namespace HalmaServer.Services {
             return (from game in Games
                 where game.GameGuid == gameGuid
                 select game).First();
+        }
+
+        //TODO get from pieces not from game
+        public bool UpdatePiecePosition(string pieceId, int x, int y, string gameGuid) {
+            // delete from here
+            var currentGame = (from game in Games
+                where game.GameGuid == gameGuid
+                select game).FirstOrDefault();
+
+            if (currentGame == null) {
+                return false;
+            }
+
+            // get piece from pieces list
+            var pieceToUpdate = (from piece in currentGame.Pieces
+                where piece.PieceId == pieceId
+                select piece).FirstOrDefault();
+            
+            if (pieceToUpdate != null) {
+                pieceToUpdate.X = x;
+                pieceToUpdate.Y = y;
+                return true;
+            } else {
+                return false;
+            }
         }
     }
 }

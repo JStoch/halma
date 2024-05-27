@@ -21,5 +21,28 @@ namespace HalmaServer.Hubs
             }
         }
 
+        public async Task MakeMove(string gameGuid, string playerGuid, List<int> from, List<int> to) {
+            var isMoveValid = GameService.MakeMove(gameGuid, playerGuid, from, to);
+            var game = GameService.GetGame(gameGuid);
+            if (game == null) {
+                return;
+            }
+
+            // always sync the caller, send data to the oponnent only if the move was valid
+            await Clients.Caller.SendAsync("SyncGameState", game.GetPlayerPieces(true), game.GetPlayerPieces(false), game.CanPlayerMove(playerGuid));
+
+            if (!isMoveValid) {
+                return;
+            }
+            
+            var oponnent = game.GetOponnent(playerGuid);
+            await Clients.Client(oponnent.ConnectionId).SendAsync("SyncGameState", game.GetPlayerPieces(true), game.GetPlayerPieces(false), game.CanPlayerMove(oponnent.PlayerGuid));
+            
+            if (game.IsGameFinished()) {
+                await Clients.Client(oponnent.ConnectionId).SendAsync("EndOfGame", game.DidPlayerWin(oponnent.PlayerGuid));
+                await Clients.Caller.SendAsync("EndOfGame", game.DidPlayerWin(playerGuid));
+            }
+        }
+
     }
 }

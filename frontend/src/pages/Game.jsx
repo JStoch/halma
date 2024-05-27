@@ -48,8 +48,8 @@ const staticPieces = {
   ],
 };
 
-const staticPlayer = 2;
-const staticTurn = 2;
+const firstPlayer = 2;
+const secondPlayer = 1;
 
 function compareArrays(arr1, arr2) {
   return JSON.stringify(arr1) == JSON.stringify(arr2);
@@ -61,6 +61,7 @@ const port = 8080
 function Game() {
   const [pieces, setPieces] = useState({ player1: [], player2: [] });
   const [player, setPlayer] = useState(0);
+  const [oponnent, setOponnent] = useState(0);
   const [turn, setTurn] = useState(0);
   const [dragging, setDragging] = useState(false);
   const [selectedPiece, setSelectedPiece] = useState(null);
@@ -74,8 +75,6 @@ function Game() {
 
   useEffect(() => {
     setPieces(staticPieces);
-    setPlayer(staticPlayer);
-    setTurn(staticTurn);
 
     connection.on("WaitingForGame", () => {
       //TODO react accordingly
@@ -83,6 +82,23 @@ function Game() {
 
     connection.on("NewGame", (gameGuid, myTurn) => {
       setGameUid(gameGuid);
+      if (myTurn) {
+        setPlayer(firstPlayer);
+        setOponnent(secondPlayer);
+      } else {
+        setPlayer(secondPlayer);
+        setOponnent(firstPlayer);
+      }
+      setTurn(firstPlayer);
+    });
+
+    connection.on("SyncGameState", (p1Pieces, p2Pieces, myTurn) => {
+      setPieces({
+        player1: p2Pieces, 
+        player2: p1Pieces
+      });
+      
+      //TODO change turn based on myTurn (bool) param
     });
 
     connection.start().then(() => {
@@ -152,6 +168,8 @@ function Game() {
       });
     }
 
+    console.log(selectedField);
+    connection.invoke("MakeMove", gameuid, uuid, selectedPiece, selectedField);
     setSelectedField(null);
     setSelectedPiece(null);
   };
