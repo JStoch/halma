@@ -61,7 +61,6 @@ const port = 8080
 function Game() {
   const [pieces, setPieces] = useState({ player1: [], player2: [] });
   const [player, setPlayer] = useState(0);
-  const [oponnent, setOponnent] = useState(0);
   const [turn, setTurn] = useState(0);
   const [dragging, setDragging] = useState(false);
   const [selectedPiece, setSelectedPiece] = useState(null);
@@ -84,10 +83,8 @@ function Game() {
       setGameUid(gameGuid);
       if (myTurn) {
         setPlayer(firstPlayer);
-        setOponnent(secondPlayer);
       } else {
         setPlayer(secondPlayer);
-        setOponnent(firstPlayer);
       }
       setTurn(firstPlayer);
     });
@@ -98,7 +95,13 @@ function Game() {
         player2: p1Pieces
       });
       
-      //TODO change turn based on myTurn (bool) param
+      // TODO change turn based on myTurn (bool) param
+    });
+
+    connection.on("EndOfGame", (didIWin) => {
+      // TODO handle end of game (someone won)
+      // WARNING this might be sent multiple times, but only once with "didIWin" param (not sure why)
+      // let me know if it's a problem
     });
 
     connection.start().then(() => {
@@ -168,7 +171,6 @@ function Game() {
       });
     }
 
-    console.log(selectedField);
     connection.invoke("MakeMove", gameuid, uuid, selectedPiece, selectedField);
     setSelectedField(null);
     setSelectedPiece(null);

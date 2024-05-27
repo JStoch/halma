@@ -8,53 +8,60 @@ namespace HalmaServer.Models {
         private bool Player1Turn {get; set;}
         private bool? DidPlayer1Win {get; set;}
 
+        private List<(int, int)> P1Zone = [
+            (0, 0),
+            (0, 1),
+            (0, 2),
+            (0, 3),
+            (0, 4),
+            (1, 0),
+            (1, 1),
+            (1, 2),
+            (1, 3),
+            (1, 4),
+            (2, 0),
+            (2, 1),
+            (2, 2),
+            (2, 3),
+            (3, 0),
+            (3, 1),
+            (3, 2),
+            (4, 0),
+            (4, 1)
+        ];
+
+        private List<(int, int)> P2Zone = [
+            (15, 11),
+            (15, 12),
+            (15, 13),
+            (15, 14),
+            (15, 15),
+            (14, 11),
+            (14, 12),
+            (14, 13),
+            (14, 14),
+            (14, 15),
+            (13, 12),
+            (13, 13),
+            (13, 14),
+            (13, 15),
+            (12, 13),
+            (12, 14),
+            (12, 15),
+            (11, 14),
+            (11, 15),
+        ];
+
         public GameModel(PlayerModel player1, PlayerModel player2) {
             GameGuid = Guid.NewGuid().ToString();
             Player1 = player1;
             Player2 = player2;
             Player1Turn = true;
-            DidPlayer1Win = false;
+            DidPlayer1Win = null;
 
-            Pieces  = [
-                new PiecePositionModel(0, 0, this, Player1),
-                new PiecePositionModel(0, 1, this, Player1),
-                new PiecePositionModel(0, 2, this, Player1),
-                new PiecePositionModel(0, 3, this, Player1),
-                new PiecePositionModel(0, 4, this, Player1),
-                new PiecePositionModel(1, 0, this, Player1),
-                new PiecePositionModel(1, 1, this, Player1),
-                new PiecePositionModel(1, 2, this, Player1),
-                new PiecePositionModel(1, 3, this, Player1),
-                new PiecePositionModel(1, 4, this, Player1),
-                new PiecePositionModel(2, 0, this, Player1),
-                new PiecePositionModel(2, 1, this, Player1),
-                new PiecePositionModel(2, 2, this, Player1),
-                new PiecePositionModel(2, 3, this, Player1),
-                new PiecePositionModel(3, 0, this, Player1),
-                new PiecePositionModel(3, 1, this, Player1),
-                new PiecePositionModel(3, 2, this, Player1),
-                new PiecePositionModel(4, 0, this, Player1),
-                new PiecePositionModel(4, 1, this, Player1),
-                new PiecePositionModel(15, 11, this, Player2),
-                new PiecePositionModel(15, 12, this, Player2),
-                new PiecePositionModel(15, 13, this, Player2),
-                new PiecePositionModel(15, 14, this, Player2),
-                new PiecePositionModel(15, 15, this, Player2),
-                new PiecePositionModel(14, 11, this, Player2),
-                new PiecePositionModel(14, 12, this, Player2),
-                new PiecePositionModel(14, 13, this, Player2),
-                new PiecePositionModel(14, 14, this, Player2),
-                new PiecePositionModel(14, 15, this, Player2),
-                new PiecePositionModel(13, 12, this, Player2),
-                new PiecePositionModel(13, 13, this, Player2),
-                new PiecePositionModel(13, 14, this, Player2),
-                new PiecePositionModel(13, 15, this, Player2),
-                new PiecePositionModel(12, 13, this, Player2),
-                new PiecePositionModel(12, 14, this, Player2),
-                new PiecePositionModel(12, 15, this, Player2),
-                new PiecePositionModel(11, 14, this, Player2),
-                new PiecePositionModel(11, 15, this, Player2)
-            ];
+            Pieces = [];
+            P1Zone.ForEach( pieceCoord => Pieces.Add(new PiecePositionModel(pieceCoord.Item1, pieceCoord.Item2, this, player1)));
+            P2Zone.ForEach( pieceCoord => Pieces.Add(new PiecePositionModel(pieceCoord.Item1, pieceCoord.Item2, this, player2)));
         }
 
         public PlayerModel GetPlayer(string playerGuid) {
@@ -93,6 +100,21 @@ namespace HalmaServer.Models {
         }
 
         public void NextMove() {
+            var changedPiecesSet = GetPlayerPieces(Player1Turn);
+
+            var hasPlayerWon = changedPiecesSet.All(piece => {
+                var pieceCoord = (piece[0], piece[1]);
+                if (Player1Turn) {
+                    return P2Zone.Contains(pieceCoord);
+                } else {
+                    return P1Zone.Contains(pieceCoord);
+                }
+            });
+
+            if (hasPlayerWon) {
+                DidPlayer1Win = Player1Turn;
+            }
+
             Player1Turn = !Player1Turn;
         }
     }
