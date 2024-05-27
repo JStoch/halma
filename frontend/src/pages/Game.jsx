@@ -110,6 +110,11 @@ function Game() {
   }, []);
 
   const validatePosition = (from, to, turn) => {
+    // check if target is on board
+    if (to[0] < 0 || to[1] < 0 || to[0] > 15 || to[1] > 15) {
+      return false;
+    }
+
     const p1Pieces = pieces["player1"];
     const p2Pieces = pieces["player2"];
 
@@ -139,6 +144,60 @@ function Game() {
     }
 
     return false;
+  };
+
+  const addMoveIfValid = (from, to, validMoves) => {
+    if (validatePosition(from, to, turn)) {
+      validMoves.push(to);
+    }
+  };
+
+  const addJumpIfValid = (from, to, middle, validMoves, jumpQueue) => {
+    // add only if this position hasn't already been visited
+    // and the middle is occupied
+    if (!validMoves.find((piece) => compareArrays(piece, to)) 
+      && (pieces["player1"].find((piece) => compareArrays(piece, middle)) ||
+    pieces["player2"].find((piece) => compareArrays(piece, middle)))
+      && validatePosition(from, to, turn)) 
+    {
+      validMoves.push(to);
+      jumpQueue.push(to);
+    }
+  };
+
+  const getValidMoves = (from) => {
+    var validMoves = [];
+
+    // side moves
+    addMoveIfValid(from, [from[0] + 1, from[1]], validMoves);
+    addMoveIfValid(from, [from[0] - 1, from[1]], validMoves);
+    addMoveIfValid(from, [from[0], from[1] + 1], validMoves);
+    addMoveIfValid(from, [from[0], from[1] - 1], validMoves);
+
+    // diagonal moves
+    addMoveIfValid(from, [from[0] + 1, from[1] + 1], validMoves);
+    addMoveIfValid(from, [from[0] - 1, from[1] + 1], validMoves);
+    addMoveIfValid(from, [from[0] + 1, from[1] - 1], validMoves);
+    addMoveIfValid(from, [from[0] - 1, from[1] - 1], validMoves);
+
+    // jumps
+    var jumpsQueue = [from];
+    while (jumpsQueue.length > 0) {
+      var currentPos = jumpsQueue.shift();
+
+      // side jumps
+      addJumpIfValid(from, [currentPos[0] - 2, currentPos[1]], [currentPos[0] - 1, currentPos[1]], validMoves, jumpsQueue);
+      addJumpIfValid(from, [currentPos[0] + 2, currentPos[1]], [currentPos[0] + 1, currentPos[1]], validMoves, jumpsQueue);
+      addJumpIfValid(from, [currentPos[0], currentPos[1] - 2], [currentPos[0], currentPos[1] - 1], validMoves, jumpsQueue);
+      addJumpIfValid(from, [currentPos[0], currentPos[1] + 2], [currentPos[0], currentPos[1] + 1], validMoves, jumpsQueue);
+
+      // diagonal jumps
+      addJumpIfValid(from, [currentPos[0] - 2, currentPos[1] - 2], [currentPos[0] - 1, currentPos[1] - 1], validMoves, jumpsQueue);
+      addJumpIfValid(from, [currentPos[0] + 2, currentPos[1] + 2], [currentPos[0] + 1, currentPos[1] + 1], validMoves, jumpsQueue);
+      addJumpIfValid(from, [currentPos[0] - 2, currentPos[1] + 2], [currentPos[0] - 1, currentPos[1] + 1], validMoves, jumpsQueue);
+      addJumpIfValid(from, [currentPos[0] + 2, currentPos[1] - 2], [currentPos[0] + 1, currentPos[1] - 1], validMoves, jumpsQueue);
+    }
+    return validMoves;
   };
 
   const makeMove = () => {
