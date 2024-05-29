@@ -70,5 +70,18 @@ namespace HalmaServer.Services {
                 return false;
             }
         }
+
+        public bool UpdateIsGameActive(string gameGuid, bool isActive) {
+            var currentGame = (from game in Games
+                where game.GameGuid == gameGuid
+                select game).FirstOrDefault();
+
+            if (currentGame == null) {
+                return false;
+            }
+
+            currentGame.IsGameActive = isActive;
+            return true;
+        }
     }
 }

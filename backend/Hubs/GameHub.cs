@@ -50,6 +50,13 @@ namespace HalmaServer.Hubs
             }
         }
 
+        public async Task StopGame(string gameGuid, string playerGuid) {
+            GameService.StopGame(gameGuid);
+            var game = GameService.GetGame(gameGuid);
+            var oponnent = game.GetOponnent(playerGuid);
+            await Clients.Client(oponnent.ConnectionId).SendAsync("GameStopped");
+        }
+        
         private async Task SyncGameState(string playerConnection, GameModel game) {
             await Clients.Client(playerConnection).SendAsync("SyncGameState", game.GetPlayerPieces(false), game.GetPlayerPieces(true), game.GetActivePlayerSymbol());
         }
