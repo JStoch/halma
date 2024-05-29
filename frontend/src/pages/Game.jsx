@@ -79,23 +79,17 @@ function Game() {
       //TODO react accordingly
     });
 
-    connection.on("NewGame", (gameGuid, myTurn) => {
+    connection.on("NewGame", (gameGuid, mySymbol) => {
       setGameUid(gameGuid);
-      if (myTurn) {
-        setPlayer(firstPlayer);
-      } else {
-        setPlayer(secondPlayer);
-      }
-      setTurn(firstPlayer);
+      setPlayer(mySymbol);
     });
 
-    connection.on("SyncGameState", (p1Pieces, p2Pieces, myTurn) => {
+    connection.on("SyncGameState", (p1Pieces, p2Pieces, activePlayer) => {
       setPieces({
-        player1: p2Pieces, 
-        player2: p1Pieces
+        player1: p1Pieces, 
+        player2: p2Pieces
       });
-      
-      // TODO change turn based on myTurn (bool) param
+      setTurn(activePlayer);
     });
 
     connection.on("EndOfGame", (didIWin) => {

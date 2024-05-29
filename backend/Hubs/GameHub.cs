@@ -1,4 +1,5 @@
 
+using HalmaServer.Models;
 using HalmaServer.Services;
 using Microsoft.AspNetCore.SignalR;
 
@@ -14,8 +15,13 @@ namespace HalmaServer.Hubs
             if (game != null) {
                 var player = game.GetPlayer(playerGuid);
                 var oponnent = game.GetOponnent(playerGuid);
-                await Clients.Client(oponnent.ConnectionId).SendAsync("NewGame", game.GameGuid, game.CanPlayerMove(oponnent.PlayerGuid));
-                await Clients.Caller.SendAsync("NewGame", game.GameGuid, game.CanPlayerMove(player.PlayerGuid));
+                // start game
+                await Clients.Client(oponnent.ConnectionId).SendAsync("NewGame", game.GameGuid, game.GetPlayerSymbol(oponnent.PlayerGuid));
+                await Clients.Caller.SendAsync("NewGame", game.GameGuid, game.GetPlayerSymbol(player.PlayerGuid));
+
+                // sync state for the start
+                await SyncGameState(Context.ConnectionId, game);
+                await SyncGameState(oponnent.ConnectionId, game);
             } else {
                 await Clients.Caller.SendAsync("WaitingForGame");
             }
@@ -29,19 +35,23 @@ namespace HalmaServer.Hubs
             }
 
             // always sync the caller, send data to the oponnent only if the move was valid
-            await Clients.Caller.SendAsync("SyncGameState", game.GetPlayerPieces(true), game.GetPlayerPieces(false), game.CanPlayerMove(playerGuid));
-
+            await SyncGameState(Context.ConnectionId, game);
+            
             if (!isMoveValid) {
                 return;
             }
             
             var oponnent = game.GetOponnent(playerGuid);
-            await Clients.Client(oponnent.ConnectionId).SendAsync("SyncGameState", game.GetPlayerPieces(true), game.GetPlayerPieces(false), game.CanPlayerMove(oponnent.PlayerGuid));
-            
+            await SyncGameState(oponnent.ConnectionId, game);
+
             if (game.IsGameFinished()) {
                 await Clients.Client(oponnent.ConnectionId).SendAsync("EndOfGame", game.DidPlayerWin(oponnent.PlayerGuid));
                 await Clients.Caller.SendAsync("EndOfGame", game.DidPlayerWin(playerGuid));
             }
+        }
+
+        private async Task SyncGameState(string playerConnection, GameModel game) {
+            await Clients.Client(playerConnection).SendAsync("SyncGameState", game.GetPlayerPieces(false), game.GetPlayerPieces(true), game.GetActivePlayerSymbol());
         }
 
     }
