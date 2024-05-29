@@ -52,6 +52,10 @@ namespace HalmaServer.Models {
             (11, 15),
         ];
 
+        // map values to match player's pawns position in the client app
+        const int P1SYMBOL = 2;
+        const int P2SYMBOL = 1;
+
         public GameModel(PlayerModel player1, PlayerModel player2) {
             GameGuid = Guid.NewGuid().ToString();
             Player1 = player1;
@@ -82,6 +86,22 @@ namespace HalmaServer.Models {
 
         public bool CanPlayerMove(string playerGuid) {
             return Player1.PlayerGuid == playerGuid == Player1Turn;
+        }
+
+        public int GetActivePlayerSymbol() {
+            if (Player1Turn) {
+                return P1SYMBOL;
+            } else {
+                return P2SYMBOL;
+            }
+        }
+
+        public int GetPlayerSymbol(string playerGuid) {
+            if (Player1.PlayerGuid == playerGuid) {
+                return P1SYMBOL;
+            } else {
+                return P2SYMBOL;
+            }
         }
 
         public bool IsGameFinished() {
