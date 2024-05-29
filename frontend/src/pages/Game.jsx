@@ -78,6 +78,11 @@ function Game() {
       console.log(`Got answer back: ${param}`);
     });
 
+    connection.on("GameStopped", () => {
+      // TODO this message means that the other player exited the game
+      // the exiting player should use connection.invoke("StopGame", gameGuid, playerGuid)
+    });
+
     connection.start().then(() => {
       connection.invoke("TestConnection", "Testest");
     });
