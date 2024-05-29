@@ -63,5 +63,9 @@ namespace HalmaServer.Services {
             return Repository.GetGame(gameGuid);
         }
 
+        public void StopGame(string gameGuid) {
+            Repository.UpdateIsGameActive(gameGuid, false);
+        }
+
     }
 }

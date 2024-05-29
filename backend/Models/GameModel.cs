@@ -4,6 +4,7 @@ namespace HalmaServer.Models {
         public PlayerModel Player1 {get; set;}
         public PlayerModel Player2 {get; set;}
         public List<PiecePositionModel> Pieces {get;}
+        public bool IsGameActive {get; set;}
 
         private bool Player1Turn {get; set;}
         private bool? DidPlayer1Win {get; set;}
@@ -62,6 +63,7 @@ namespace HalmaServer.Models {
             Player2 = player2;
             Player1Turn = true;
             DidPlayer1Win = null;
+            IsGameActive = true;
 
             Pieces = [];
             P1Zone.ForEach( pieceCoord => Pieces.Add(new PiecePositionModel(pieceCoord.Item1, pieceCoord.Item2, this, player1)));
@@ -133,6 +135,7 @@ namespace HalmaServer.Models {
 
             if (hasPlayerWon) {
                 DidPlayer1Win = Player1Turn;
+                IsGameActive = true;
             }
 
             Player1Turn = !Player1Turn;
