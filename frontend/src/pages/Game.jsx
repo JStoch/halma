@@ -1,7 +1,8 @@
 import Board from "../components/Board";
 import { useEffect, useState } from "react";
 import * as signalR from "@microsoft/signalr";
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4 } from "uuid";
+import Button from "../components/Button";
 
 const staticPieces = {
   player1: [
@@ -48,6 +49,14 @@ const staticPieces = {
   ],
 };
 
+const loadingTextArray = [
+  "Strategizing Moves...",
+  "Setting Up the Board...",
+  "Assembling Pieces...",
+  "Loading Your Halma Experience...",
+  "Getting Your Opponents Ready...",
+];
+
 const firstPlayer = 2;
 const secondPlayer = 1;
 
@@ -55,8 +64,8 @@ function compareArrays(arr1, arr2) {
   return JSON.stringify(arr1) == JSON.stringify(arr2);
 }
 
-const ip = "localhost"
-const port = 8080
+const ip = "localhost";
+const port = 8080;
 
 function Game() {
   const [pieces, setPieces] = useState({ player1: [], player2: [] });
@@ -65,12 +74,18 @@ function Game() {
   const [dragging, setDragging] = useState(false);
   const [selectedPiece, setSelectedPiece] = useState(null);
   const [selectedField, setSelectedField] = useState(null);
-  const [connection] = useState(new signalR.HubConnectionBuilder().withUrl(`http://${ip}:${port}/game`, {
-    skipNegotiation: true,
-    transport: signalR.HttpTransportType.WebSockets
-  }).build());
+  const [connection] = useState(
+    new signalR.HubConnectionBuilder()
+      .withUrl(`http://${ip}:${port}/game`, {
+        skipNegotiation: true,
+        transport: signalR.HttpTransportType.WebSockets,
+      })
+      .build()
+  );
   const [uuid] = useState(uuidv4());
   const [gameuid, setGameUid] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [loadingText, setLoadingText] = useState(loadingTextArray[0]);
 
   useEffect(() => {
     setPieces(staticPieces);
@@ -80,14 +95,16 @@ function Game() {
     });
 
     connection.on("NewGame", (gameGuid, mySymbol) => {
+      console.log("asd");
+      setLoading(false);
       setGameUid(gameGuid);
       setPlayer(mySymbol);
     });
 
     connection.on("SyncGameState", (p1Pieces, p2Pieces, activePlayer) => {
       setPieces({
-        player1: p1Pieces, 
-        player2: p2Pieces
+        player1: p1Pieces,
+        player2: p2Pieces,
       });
       setTurn(activePlayer);
     });
@@ -104,8 +121,21 @@ function Game() {
     });
 
     connection.start().then(() => {
+      setLoading(true);
       connection.invoke("RequestNewGame", uuid);
     });
+
+    const interval = setInterval(() => {
+      setLoadingText((prevText) => {
+        const currentIndex = loadingTextArray.indexOf(prevText);
+        const nextIndex = (currentIndex + 1) % loadingTextArray.length;
+        return loadingTextArray[nextIndex];
+      });
+    }, 5000);
+
+    return () => {
+      clearInterval(interval);
+    };
   }, []);
 
   const validatePosition = (from, to, turn) => {
@@ -154,11 +184,12 @@ function Game() {
   const addJumpIfValid = (from, to, middle, validMoves, jumpQueue) => {
     // add only if this position hasn't already been visited
     // and the middle is occupied
-    if (!validMoves.find((piece) => compareArrays(piece, to)) 
-      && (pieces["player1"].find((piece) => compareArrays(piece, middle)) ||
-    pieces["player2"].find((piece) => compareArrays(piece, middle)))
-      && validatePosition(from, to, turn)) 
-    {
+    if (
+      !validMoves.find((piece) => compareArrays(piece, to)) &&
+      (pieces["player1"].find((piece) => compareArrays(piece, middle)) ||
+        pieces["player2"].find((piece) => compareArrays(piece, middle))) &&
+      validatePosition(from, to, turn)
+    ) {
       validMoves.push(to);
       jumpQueue.push(to);
     }
@@ -185,16 +216,64 @@ function Game() {
       var currentPos = jumpsQueue.shift();
 
       // side jumps
-      addJumpIfValid(from, [currentPos[0] - 2, currentPos[1]], [currentPos[0] - 1, currentPos[1]], validMoves, jumpsQueue);
-      addJumpIfValid(from, [currentPos[0] + 2, currentPos[1]], [currentPos[0] + 1, currentPos[1]], validMoves, jumpsQueue);
-      addJumpIfValid(from, [currentPos[0], currentPos[1] - 2], [currentPos[0], currentPos[1] - 1], validMoves, jumpsQueue);
-      addJumpIfValid(from, [currentPos[0], currentPos[1] + 2], [currentPos[0], currentPos[1] + 1], validMoves, jumpsQueue);
+      addJumpIfValid(
+        from,
+        [currentPos[0] - 2, currentPos[1]],
+        [currentPos[0] - 1, currentPos[1]],
+        validMoves,
+        jumpsQueue
+      );
+      addJumpIfValid(
+        from,
+        [currentPos[0] + 2, currentPos[1]],
+        [currentPos[0] + 1, currentPos[1]],
+        validMoves,
+        jumpsQueue
+      );
+      addJumpIfValid(
+        from,
+        [currentPos[0], currentPos[1] - 2],
+        [currentPos[0], currentPos[1] - 1],
+        validMoves,
+        jumpsQueue
+      );
+      addJumpIfValid(
+        from,
+        [currentPos[0], currentPos[1] + 2],
+        [currentPos[0], currentPos[1] + 1],
+        validMoves,
+        jumpsQueue
+      );
 
       // diagonal jumps
-      addJumpIfValid(from, [currentPos[0] - 2, currentPos[1] - 2], [currentPos[0] - 1, currentPos[1] - 1], validMoves, jumpsQueue);
-      addJumpIfValid(from, [currentPos[0] + 2, currentPos[1] + 2], [currentPos[0] + 1, currentPos[1] + 1], validMoves, jumpsQueue);
-      addJumpIfValid(from, [currentPos[0] - 2, currentPos[1] + 2], [currentPos[0] - 1, currentPos[1] + 1], validMoves, jumpsQueue);
-      addJumpIfValid(from, [currentPos[0] + 2, currentPos[1] - 2], [currentPos[0] + 1, currentPos[1] - 1], validMoves, jumpsQueue);
+      addJumpIfValid(
+        from,
+        [currentPos[0] - 2, currentPos[1] - 2],
+        [currentPos[0] - 1, currentPos[1] - 1],
+        validMoves,
+        jumpsQueue
+      );
+      addJumpIfValid(
+        from,
+        [currentPos[0] + 2, currentPos[1] + 2],
+        [currentPos[0] + 1, currentPos[1] + 1],
+        validMoves,
+        jumpsQueue
+      );
+      addJumpIfValid(
+        from,
+        [currentPos[0] - 2, currentPos[1] + 2],
+        [currentPos[0] - 1, currentPos[1] + 1],
+        validMoves,
+        jumpsQueue
+      );
+      addJumpIfValid(
+        from,
+        [currentPos[0] + 2, currentPos[1] - 2],
+        [currentPos[0] + 1, currentPos[1] - 1],
+        validMoves,
+        jumpsQueue
+      );
     }
     return validMoves;
   };
@@ -236,17 +315,45 @@ function Game() {
 
   return (
     <div className="flex-1 flex justify-center items-center">
-      <Board
-        className="h-6/7"
-        pieces={pieces}
-        player={player}
-        turn={turn}
-        dragging={dragging}
-        setDragging={setDragging}
-        setSelectedPiece={setSelectedPiece}
-        setSelectedField={setSelectedField}
-        makeMove={makeMove}
-      />
+      {loading ? (
+        <div className="flex flex-col items-center gap-2">
+          <svg
+            aria-hidden="true"
+            className="inline w-12 h-12 text-platinum animate-spin dark:text-gray-600 fill-gray-600 dark:fill-gray-300"
+            viewBox="0 0 100 101"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
+              fill="currentColor"
+            />
+            <path
+              d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
+              fill="currentFill"
+            />
+          </svg>
+          <span className="text-platinum text-2xl font-semibold">
+            {loadingText}
+          </span>
+          <Button
+            value="Cancel"
+            className="bg-red-500 hover:bg-red-400 relative top-6"
+          />
+        </div>
+      ) : (
+        <Board
+          className="h-6/7"
+          pieces={pieces}
+          player={player}
+          turn={turn}
+          dragging={dragging}
+          setDragging={setDragging}
+          setSelectedPiece={setSelectedPiece}
+          setSelectedField={setSelectedField}
+          makeMove={makeMove}
+        />
+      )}
     </div>
   );
 }
