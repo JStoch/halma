@@ -1,6 +1,7 @@
 using HalmaServer.Models;
 
 namespace HalmaServer.Services {
+    //TODO save changes in each function to db
     public class GameRepository() {
         //TODO connect to db
         //this whole part should be changed
@@ -71,16 +72,9 @@ namespace HalmaServer.Services {
             }
         }
 
-        public bool UpdateIsGameActive(string gameGuid, bool isActive) {
-            var currentGame = (from game in Games
-                where game.GameGuid == gameGuid
-                select game).FirstOrDefault();
-
-            if (currentGame == null) {
-                return false;
-            }
-
-            currentGame.IsGameActive = isActive;
+        // This function is called after changing: GameModel.Player1Turn
+        // And possibly GameModel.DidPlayer1Win, GameModel.IsGameActive
+        public bool UpdateGameState(GameModel game) {
             return true;
         }
     }
