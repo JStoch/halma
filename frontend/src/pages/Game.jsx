@@ -1,7 +1,9 @@
 import Board from "../components/Board";
 import { useEffect, useState } from "react";
 import * as signalR from "@microsoft/signalr";
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4 } from "uuid";
+import Button from "../components/Button";
+import Loading from "../components/Loading";
 
 const staticPieces = {
   player1: [
@@ -48,6 +50,14 @@ const staticPieces = {
   ],
 };
 
+const loadingTextArray = [
+  "Strategizing Moves...",
+  "Setting Up the Board...",
+  "Assembling Pieces...",
+  "Loading Your Halma Experience...",
+  "Getting Your Opponents Ready...",
+];
+
 const firstPlayer = 2;
 const secondPlayer = 1;
 
@@ -55,8 +65,8 @@ function compareArrays(arr1, arr2) {
   return JSON.stringify(arr1) == JSON.stringify(arr2);
 }
 
-const ip = "localhost"
-const port = 8080
+const ip = "localhost";
+const port = 8080;
 
 function Game() {
   const [pieces, setPieces] = useState({ player1: [], player2: [] });
@@ -65,12 +75,18 @@ function Game() {
   const [dragging, setDragging] = useState(false);
   const [selectedPiece, setSelectedPiece] = useState(null);
   const [selectedField, setSelectedField] = useState(null);
-  const [connection] = useState(new signalR.HubConnectionBuilder().withUrl(`http://${ip}:${port}/game`, {
-    skipNegotiation: true,
-    transport: signalR.HttpTransportType.WebSockets
-  }).build());
+  const [connection] = useState(
+    new signalR.HubConnectionBuilder()
+      .withUrl(`http://${ip}:${port}/game`, {
+        skipNegotiation: true,
+        transport: signalR.HttpTransportType.WebSockets,
+      })
+      .build()
+  );
   const [uuid] = useState(uuidv4());
   const [gameuid, setGameUid] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [loadingText, setLoadingText] = useState(loadingTextArray[0]);
 
   useEffect(() => {
     setPieces(staticPieces);
@@ -80,14 +96,16 @@ function Game() {
     });
 
     connection.on("NewGame", (gameGuid, mySymbol) => {
+      console.log("asd");
+      setLoading(false);
       setGameUid(gameGuid);
       setPlayer(mySymbol);
     });
 
     connection.on("SyncGameState", (p1Pieces, p2Pieces, activePlayer) => {
       setPieces({
-        player1: p1Pieces, 
-        player2: p2Pieces
+        player1: p1Pieces,
+        player2: p2Pieces,
       });
       setTurn(activePlayer);
     });
@@ -104,8 +122,21 @@ function Game() {
     });
 
     connection.start().then(() => {
+      setLoading(true);
       connection.invoke("RequestNewGame", uuid);
     });
+
+    const interval = setInterval(() => {
+      setLoadingText((prevText) => {
+        const currentIndex = loadingTextArray.indexOf(prevText);
+        const nextIndex = (currentIndex + 1) % loadingTextArray.length;
+        return loadingTextArray[nextIndex];
+      });
+    }, 5000);
+
+    return () => {
+      clearInterval(interval);
+    };
   }, []);
 
   const validatePosition = (from, to, turn) => {
@@ -154,11 +185,12 @@ function Game() {
   const addJumpIfValid = (from, to, middle, validMoves, jumpQueue) => {
     // add only if this position hasn't already been visited
     // and the middle is occupied
-    if (!validMoves.find((piece) => compareArrays(piece, to)) 
-      && (pieces["player1"].find((piece) => compareArrays(piece, middle)) ||
-    pieces["player2"].find((piece) => compareArrays(piece, middle)))
-      && validatePosition(from, to, turn)) 
-    {
+    if (
+      !validMoves.find((piece) => compareArrays(piece, to)) &&
+      (pieces["player1"].find((piece) => compareArrays(piece, middle)) ||
+        pieces["player2"].find((piece) => compareArrays(piece, middle))) &&
+      validatePosition(from, to, turn)
+    ) {
       validMoves.push(to);
       jumpQueue.push(to);
     }
@@ -185,16 +217,64 @@ function Game() {
       var currentPos = jumpsQueue.shift();
 
       // side jumps
-      addJumpIfValid(from, [currentPos[0] - 2, currentPos[1]], [currentPos[0] - 1, currentPos[1]], validMoves, jumpsQueue);
-      addJumpIfValid(from, [currentPos[0] + 2, currentPos[1]], [currentPos[0] + 1, currentPos[1]], validMoves, jumpsQueue);
-      addJumpIfValid(from, [currentPos[0], currentPos[1] - 2], [currentPos[0], currentPos[1] - 1], validMoves, jumpsQueue);
-      addJumpIfValid(from, [currentPos[0], currentPos[1] + 2], [currentPos[0], currentPos[1] + 1], validMoves, jumpsQueue);
+      addJumpIfValid(
+        from,
+        [currentPos[0] - 2, currentPos[1]],
+        [currentPos[0] - 1, currentPos[1]],
+        validMoves,
+        jumpsQueue
+      );
+      addJumpIfValid(
+        from,
+        [currentPos[0] + 2, currentPos[1]],
+        [currentPos[0] + 1, currentPos[1]],
+        validMoves,
+        jumpsQueue
+      );
+      addJumpIfValid(
+        from,
+        [currentPos[0], currentPos[1] - 2],
+        [currentPos[0], currentPos[1] - 1],
+        validMoves,
+        jumpsQueue
+      );
+      addJumpIfValid(
+        from,
+        [currentPos[0], currentPos[1] + 2],
+        [currentPos[0], currentPos[1] + 1],
+        validMoves,
+        jumpsQueue
+      );
 
       // diagonal jumps
-      addJumpIfValid(from, [currentPos[0] - 2, currentPos[1] - 2], [currentPos[0] - 1, currentPos[1] - 1], validMoves, jumpsQueue);
-      addJumpIfValid(from, [currentPos[0] + 2, currentPos[1] + 2], [currentPos[0] + 1, currentPos[1] + 1], validMoves, jumpsQueue);
-      addJumpIfValid(from, [currentPos[0] - 2, currentPos[1] + 2], [currentPos[0] - 1, currentPos[1] + 1], validMoves, jumpsQueue);
-      addJumpIfValid(from, [currentPos[0] + 2, currentPos[1] - 2], [currentPos[0] + 1, currentPos[1] - 1], validMoves, jumpsQueue);
+      addJumpIfValid(
+        from,
+        [currentPos[0] - 2, currentPos[1] - 2],
+        [currentPos[0] - 1, currentPos[1] - 1],
+        validMoves,
+        jumpsQueue
+      );
+      addJumpIfValid(
+        from,
+        [currentPos[0] + 2, currentPos[1] + 2],
+        [currentPos[0] + 1, currentPos[1] + 1],
+        validMoves,
+        jumpsQueue
+      );
+      addJumpIfValid(
+        from,
+        [currentPos[0] - 2, currentPos[1] + 2],
+        [currentPos[0] - 1, currentPos[1] + 1],
+        validMoves,
+        jumpsQueue
+      );
+      addJumpIfValid(
+        from,
+        [currentPos[0] + 2, currentPos[1] - 2],
+        [currentPos[0] + 1, currentPos[1] - 1],
+        validMoves,
+        jumpsQueue
+      );
     }
     return validMoves;
   };
@@ -236,17 +316,30 @@ function Game() {
 
   return (
     <div className="flex-1 flex justify-center items-center">
-      <Board
-        className="h-6/7"
-        pieces={pieces}
-        player={player}
-        turn={turn}
-        dragging={dragging}
-        setDragging={setDragging}
-        setSelectedPiece={setSelectedPiece}
-        setSelectedField={setSelectedField}
-        makeMove={makeMove}
-      />
+      {loading ? (
+        <div className="flex flex-col items-center gap-2">
+          <Loading className="inline w-12 h-12 text-platinum animate-spin dark:text-gray-600 fill-gray-600 dark:fill-gray-300" />
+          <span className="text-platinum text-2xl font-semibold">
+            {loadingText}
+          </span>
+          <Button
+            value="Cancel"
+            className="bg-red-500 hover:bg-red-400 relative top-6"
+          />
+        </div>
+      ) : (
+        <Board
+          className="h-6/7"
+          pieces={pieces}
+          player={player}
+          turn={turn}
+          dragging={dragging}
+          setDragging={setDragging}
+          setSelectedPiece={setSelectedPiece}
+          setSelectedField={setSelectedField}
+          makeMove={makeMove}
+        />
+      )}
     </div>
   );
 }
