@@ -1,5 +1,9 @@
 ﻿#!/bin/bash
 cd ..
+# Create docker network if not exists
+
+docker network ls|grep halma-netwotk > /dev/null || docker network create halma-network
+
 
 chmod +x ./database-scripts/*.sql
 # Build MSSQL database setup image

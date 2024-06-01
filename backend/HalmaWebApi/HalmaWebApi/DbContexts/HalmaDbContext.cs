@@ -14,6 +14,10 @@ namespace HalmaWebApi.DbContexts
         public DbSet<Statistic> Statistics { get; set; }
         public DbSet<Game> Games { get; set; }
 
-
+        //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        //{
+        //    //optionsBuilder.UseLazyLoadingProxies();
+        //    base.OnConfiguring(optionsBuilder);
+        //}
     }
 }

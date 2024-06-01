@@ -35,16 +35,16 @@
       "environmentVariables": {
         "ASPNETCORE_HTTPS_PORTS": "8081",
         "ASPNETCORE_HTTP_PORTS": "8080",
-        "SQL_SERVER_HOST": "localhost",
-        "SQL_SERVER_PORT": "1433", 
-        "SQL_SERVER_USER": "SA",
-        "SQL_SERVER_PASSWORD": "P@ssw0rdSql"
+        //"SQL_SERVER_HOST": "mssql-server",
+        //"SQL_SERVER_PORT": "1433", 
+        //"SQL_SERVER_USER": "SA",
+        //"SQL_SERVER_PASSWORD": "P@ssw0rdSql"
       },
       "httpPort": 5000,
       "httpsPort": 5001,
       "publishAllPorts": true,
       "useSSL": true,
-      "DockerfileRunArguments": "--network=halma-network -itd --name=web-api"
+      "DockerfileRunArguments": "--network=halma-network -itd --name=halma-web-api"
 
     }
   },

@@ -3,7 +3,8 @@ FROM mcr.microsoft.com/mssql/server:2019-latest
 
 # Set environment variables for SQL Server
 ENV ACCEPT_EULA=Y
-ENV SA_PASSWORD=P@ssw0rdSql
+ENV MSSQL_SA_PASSWORD=P@ssw0rdSql
+ENV HOST_HOSTNAME=HALMA-MSSQL
 
 # Copy the SQL scripts for database setup
 COPY ./database-scripts /docker-entrypoint-initdb.d
@@ -21,6 +22,7 @@ RUN chmod +x /entrypoint.sh
 
 # Expose the SQL Server port
 EXPOSE 1433
+
 
 
 # Add a volume to persist data

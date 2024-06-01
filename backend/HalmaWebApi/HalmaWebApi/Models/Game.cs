@@ -11,12 +11,12 @@ namespace HalmaWebApi.Models
 
         [ForeignKey("User")]
         public string Player1RefUid { get; set; }
-        public User Player1 { get; set; }
+        public virtual User Player1 { get; set; }
 
 
         [ForeignKey("User")]
         public string Player2RefUid { get; set; }
-        public User Player2 { get; set; }
+        public virtual User Player2 { get; set; }
 
 
     }
