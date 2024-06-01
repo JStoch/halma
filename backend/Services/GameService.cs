@@ -56,6 +56,7 @@ namespace HalmaServer.Services {
 
             Repository.UpdatePiecePosition(piece.PieceId, to[0], to[1], game.GameGuid);
             game.NextMove();
+            Repository.UpdateGameState(game);
             return true;
         }
 
@@ -64,7 +65,9 @@ namespace HalmaServer.Services {
         }
 
         public void StopGame(string gameGuid) {
-            Repository.UpdateIsGameActive(gameGuid, false);
+            var game = Repository.GetGame(gameGuid);
+            game.IsGameActive = false;
+            Repository.UpdateGameState(game);
         }
 
     }
