@@ -1,16 +1,52 @@
-﻿*.swp
+﻿# Compiled files
+bin/
+obj/
+*.swp
 *.*~
 project.lock.json
 .DS_Store
 *.pyc
 *.env
 
-# Visual Studio Code
-.vscode
-
-# User-specific files
+# Visual Studio files
+.vs/
+*.vscode/
+*.sln
 *.suo
 *.user
+*.userprefs
+*.log
+*.vspscc
+*.vssscc
+*.pidb
+*.iobj
+*.ipdb
+*.obj
+*.pch
+*.suo
+*.idb
+*.pdb
+*.cache
+*.ilk
+*.mdf
+*.ldf
+*.bak
+*.cache
+*.csproj.user
+*.dbmdl
+*.jfm
+*.orig
+*.sdf
+*.sqlproj.user
+*.tlog/
+*.tlog/
+*.dbproj.user
+*.publishsettings
+*.pfx
+*.publishxml
+
+# Visual Studio Code
+.vscode/
 *.userosscache
 *.sln.docstates
 
@@ -28,6 +64,15 @@ bld/
 msbuild.log
 msbuild.err
 msbuild.wrn
+# Packages
+packages/
+*.nupkg
+*.paket/
+project.lock.json
+npm-debug.log
 
+# OS generated files
+.DS_Store
+Thumbs.db
 # Visual Studio 2015
 .vs/
