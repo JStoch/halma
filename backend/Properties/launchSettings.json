@@ -50,8 +50,8 @@
           //"SQL_SERVER_USER": "SA",
           //"SQL_SERVER_PASSWORD": "P@ssw0rdSql"
         },
-        "httpPort": 5000,
-        "httpsPort": 5001,
+        "httpPort": 8080,
+        "httpsPort": 8081,
         "publishAllPorts": true,
         "useSSL": true,
         "DockerfileRunArguments": "--network=halma-network -itd --name=halma-web-api"

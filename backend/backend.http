@@ -3,3 +3,5 @@ GET {{HalmaWebApi_HostAddress}}/Users
 Accept: application/json
 
 ###
+
+GET {{HalmaWebApi_HostAddress}}/game

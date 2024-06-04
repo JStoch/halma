@@ -1,4 +1,5 @@
-﻿using HalmaWebApi.Models;
+﻿using HalmaServer.Models;
+using HalmaWebApi.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,14 +11,51 @@ namespace HalmaWebApi.DbContexts
         {
         }
 
+
+        public DbSet<GameModel> Games { get; set; }  
+        
+        public DbSet<PiecePositionModel> PiecePositionModels { get; set; }
+        public DbSet<PlayerModel> PlayerModels { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<Statistic> Statistics { get; set; }
-        public DbSet<Game> Games { get; set; }
+        public DbSet<GameHistory> GamesHistory { get; set; }
 
         //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         //{
         //    //optionsBuilder.UseLazyLoadingProxies();
         //    base.OnConfiguring(optionsBuilder);
         //}
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            // Configure GameModel entity
+            modelBuilder.Entity<GameModel>()
+                .HasKey(g => g.GameGuid);
+
+            // Configure GamesHistoryModel entity
+            modelBuilder.Entity<GameHistory>()
+                        .HasKey(gh => gh.GameHistoryGuid);
+
+
+            modelBuilder.Entity<GameModel>()
+                        .HasOne(g => g.Player1)
+                        .WithMany()
+                        .HasForeignKey(g => g.Player1Guid)
+                        .OnDelete(DeleteBehavior.NoAction); 
+
+            modelBuilder.Entity<GameModel>()
+                .HasOne(g => g.Player2)
+                .WithMany()
+                .HasForeignKey(g => g.Player2Guid)
+                .OnDelete(DeleteBehavior.NoAction);
+
+
+            modelBuilder.Entity<PlayerModel>()
+               .HasOne(p => p.Statistic)
+               .WithMany()
+               .HasForeignKey(p => p.StatisticGuid);
+
+            base.OnModelCreating(modelBuilder);
+        }
     }
 }

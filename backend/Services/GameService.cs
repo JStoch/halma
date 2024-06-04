@@ -1,3 +1,4 @@
+using backend.Repositories;
 using HalmaServer.Models;
 
 namespace HalmaServer.Services
@@ -5,7 +6,7 @@ namespace HalmaServer.Services
     public class GameService(GameRepository repository)
     {
         private GameRepository Repository = repository;
-        private Queue<PlayerModel> WaitingCustomGamePool = new();
+        private static Queue<PlayerModel> WaitingCustomGamePool = new();
 
         public GameModel? StartGameOrWait(string playerGuid, string connectionId)
         {
@@ -25,7 +26,7 @@ namespace HalmaServer.Services
 
             var oponnent = WaitingCustomGamePool.Dequeue();
 
-            var game = new GameModel(player, oponnent);
+            var game = GameModel.GetGameModel(player, oponnent);
             Repository.AddGame(game);
             return game;
         }
@@ -72,7 +73,7 @@ namespace HalmaServer.Services
             return true;
         }
 
-        public GameModel GetGame(string gameGuid)
+        public GameModel? GetGame(string gameGuid)
         {
             return Repository.GetGame(gameGuid);
         }
