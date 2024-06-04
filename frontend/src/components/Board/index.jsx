@@ -9,6 +9,10 @@ Array.prototype.reverseIf = function (condition) {
   return this;
 };
 
+function compareArrays(arr1, arr2) {
+  return JSON.stringify(arr1) == JSON.stringify(arr2);
+}
+
 function Board({
   player,
   turn,
@@ -19,7 +23,10 @@ function Board({
   setSelectedPiece,
   makeMove,
   pieces = { player1: [], player2: [] },
+  getValidMoves,
 }) {
+  const [highlightedPiece, setHighlightedPiece] = useState(null);
+  const [shouldQuitHighlighting, setShouldQuitHighlighting] = useState(false);
   const p1Pieces = pieces["player1"].map((piece) => piece[0] * 16 + piece[1]);
   const p2Pieces = pieces["player2"].map((piece) => piece[0] * 16 + piece[1]);
   const reverseBoard = player === 2;
@@ -27,6 +34,25 @@ function Board({
   const handleMouseLeave = () => {
     setSelectedField(null);
   };
+
+  const handleSetHighlightedPiece = (newPiece) => {
+    setShouldQuitHighlighting(false);
+    if (!compareArrays(newPiece, highlightedPiece)) {
+      setHighlightedPiece(newPiece);
+    } else {
+      setShouldQuitHighlighting(true);
+    }
+  };
+
+  const highlightedPieceCode = highlightedPiece
+    ? highlightedPiece[0] * 16 + highlightedPiece[1]
+    : null;
+
+  let validMoves = highlightedPiece ? getValidMoves(highlightedPiece) : [];
+  if (validMoves) {
+    validMoves = validMoves.map((pos) => pos[0] * 16 + pos[1]);
+  }
+  console.log(validMoves);
 
   return (
     <div
@@ -41,6 +67,8 @@ function Board({
             color={(i + ~~(i / 16)) % 2 ? "white" : "black"}
             setSelectedField={setSelectedField}
             fieldPosition={[~~(i / 16), i % 16]}
+            highlighted={i === highlightedPieceCode}
+            movePossible={validMoves.includes(i)}
           >
             {p1Pieces.includes(i) ? (
               <Piece
@@ -50,6 +78,9 @@ function Board({
                 setSelectedPiece={setSelectedPiece}
                 piecePosition={[~~(i / 16), i % 16]}
                 makeMove={makeMove}
+                setHighlightedPiece={handleSetHighlightedPiece}
+                highlighted={i === highlightedPieceCode}
+                shouldQuitHighlighting={shouldQuitHighlighting}
               />
             ) : null}
             {p2Pieces.includes(i) ? (
@@ -60,6 +91,9 @@ function Board({
                 setSelectedPiece={setSelectedPiece}
                 piecePosition={[~~(i / 16), i % 16]}
                 makeMove={makeMove}
+                setHighlightedPiece={handleSetHighlightedPiece}
+                highlighted={i === highlightedPieceCode}
+                shouldQuitHighlighting={shouldQuitHighlighting}
               />
             ) : null}
           </Field>

@@ -1,5 +1,14 @@
-function Field({ color, dragging, children, fieldPosition, setSelectedField }) {
-  const bgColor = color === "white" ? "bg-platinum" : "bg-neutral-800";
+function Field({
+  color,
+  dragging,
+  children,
+  fieldPosition,
+  setSelectedField,
+  highlighted,
+  movePossible,
+}) {
+  let bgColor = color === "white" ? "bg-platinum" : "bg-neutral-800";
+  bgColor = highlighted ? "bg-yellow-500" : bgColor;
 
   return (
     <div
@@ -15,7 +24,11 @@ function Field({ color, dragging, children, fieldPosition, setSelectedField }) {
         }
       }}
     >
-      {children}
+      {movePossible ? (
+        <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
+      ) : (
+        children
+      )}
     </div>
   );
 }
