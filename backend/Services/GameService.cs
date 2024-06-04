@@ -5,7 +5,8 @@ namespace HalmaServer.Services
     public class GameService(GameRepository repository)
     {
         private GameRepository Repository = repository;
-        private Queue<PlayerModel> WaitingCustomGamePool = new();
+        // a list as queue, because a standard c# queue can't remove items from the middle
+        private static List<PlayerModel> WaitingCustomGamePool = new();
 
         public GameModel? StartGameOrWait(string playerGuid, string connectionId)
         {
@@ -19,11 +20,12 @@ namespace HalmaServer.Services
 
             if (WaitingCustomGamePool.Count == 0)
             {
-                WaitingCustomGamePool.Enqueue(player);
+                WaitingCustomGamePool.Add(player);
                 return null;
             }
 
-            var oponnent = WaitingCustomGamePool.Dequeue();
+            var oponnent = WaitingCustomGamePool[0];
+            WaitingCustomGamePool.Remove(oponnent);
 
             var game = new GameModel(player, oponnent);
             Repository.AddGame(game);
@@ -82,6 +84,10 @@ namespace HalmaServer.Services
             var game = Repository.GetGame(gameGuid);
             game.IsGameActive = false;
             Repository.UpdateGameState(game);
+        }
+
+        public void RemoveFromQueue(string playerGuid) {
+            WaitingCustomGamePool.Remove(GetPlayer(playerGuid, ""));
         }
 
     }
