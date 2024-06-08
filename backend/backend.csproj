@@ -9,6 +9,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="CISHasTakenTheCommandPost\**" />
+    <Content Remove="CISHasTakenTheCommandPost\**" />
+    <EmbeddedResource Remove="CISHasTakenTheCommandPost\**" />
+    <None Remove="CISHasTakenTheCommandPost\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.AspNet.WebApi.Core" Version="5.3.0" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.6" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.6" />
@@ -28,7 +35,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="CISHasTakenTheCommandPost\" />
     <Folder Include="Migrations\" />
   </ItemGroup>
 

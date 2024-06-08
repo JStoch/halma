@@ -1,4 +1,5 @@
 ﻿using backend.Repositories;
+using backend.Services;
 using HalmaServer.Hubs;
 using HalmaServer.Models;
 using HalmaServer.Services;
@@ -48,6 +49,7 @@ namespace backend
             services.AddSignalR();
             services.AddScoped<GameRepository>();
             services.AddScoped<GameService>();
+            services.AddScoped<BotDispacherService>();
 
             // Added repo fabric for managing repository existence
             services.AddScoped(provider =>

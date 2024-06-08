@@ -8,7 +8,12 @@ namespace HalmaServer.Services
         private GameRepository Repository = repository;
         private static Queue<PlayerModel> WaitingCustomGamePool = new();
 
-        public GameModel? StartGameOrWait(string playerGuid, string connectionId)
+        public PlayerModel CreateBotPlayerModel()
+        {
+            return new PlayerModel("BOT");
+        }
+
+        public GameModel? StartGameOrWait(string playerGuid, string connectionId, bool requestBotOponent = false)
         {
             var player = GetPlayer(playerGuid, connectionId);
             if (WaitingCustomGamePool.Contains(player))
@@ -24,7 +29,7 @@ namespace HalmaServer.Services
                 return null;
             }
 
-            var oponnent = WaitingCustomGamePool.Dequeue();
+            var oponnent = requestBotOponent ? CreateBotPlayerModel() : WaitingCustomGamePool.Dequeue();
 
             var game = GameModel.GetGameModel(player, oponnent);
             Repository.AddGame(game);
@@ -47,6 +52,8 @@ namespace HalmaServer.Services
             return player;
         }
 
+
+
         public bool MakeMove(string gameGuid, string playerGuid, List<int> from, List<int> to)
         {
             var game = Repository.GetGame(gameGuid);
@@ -55,6 +62,7 @@ namespace HalmaServer.Services
             {
                 return false;
             }
+
 
             var prevX = from[0];
             var prevY = from[1];
