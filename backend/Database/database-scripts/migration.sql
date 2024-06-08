@@ -75,15 +75,15 @@ CREATE TABLE [GamesHistory] (
 );
 GO
 
-CREATE TABLE [PiecePositionModel] (
+CREATE TABLE [PiecePositionModels] (
     [PieceId] nvarchar(450) NOT NULL,
     [X] int NOT NULL,
     [Y] int NOT NULL,
     [GameGuid] nvarchar(450) NOT NULL,
-    [PlayerGuid] nvarchar(450) NULL,
-    CONSTRAINT [PK_PiecePositionModel] PRIMARY KEY ([PieceId]),
-    CONSTRAINT [FK_PiecePositionModel_Games_GameGuid] FOREIGN KEY ([GameGuid]) REFERENCES [Games] ([GameGuid]) ON DELETE CASCADE,
-    CONSTRAINT [FK_PiecePositionModel_PlayerModels_PlayerGuid] FOREIGN KEY ([PlayerGuid]) REFERENCES [PlayerModels] ([PlayerGuid])
+    [OwnerGuid] nvarchar(450) NOT NULL,
+    CONSTRAINT [PK_PiecePositionModels] PRIMARY KEY ([PieceId]),
+    CONSTRAINT [FK_PiecePositionModels_Games_GameGuid] FOREIGN KEY ([GameGuid]) REFERENCES [Games] ([GameGuid]) ON DELETE CASCADE,
+    CONSTRAINT [FK_PiecePositionModels_PlayerModels_OwnerGuid] FOREIGN KEY ([OwnerGuid]) REFERENCES [PlayerModels] ([PlayerGuid]) ON DELETE CASCADE
 );
 GO
 
@@ -96,10 +96,10 @@ GO
 CREATE INDEX [IX_GamesHistory_GameModelGuid] ON [GamesHistory] ([GameModelGuid]);
 GO
 
-CREATE INDEX [IX_PiecePositionModel_GameGuid] ON [PiecePositionModel] ([GameGuid]);
+CREATE INDEX [IX_PiecePositionModels_GameGuid] ON [PiecePositionModels] ([GameGuid]);
 GO
 
-CREATE INDEX [IX_PiecePositionModel_PlayerGuid] ON [PiecePositionModel] ([PlayerGuid]);
+CREATE INDEX [IX_PiecePositionModels_OwnerGuid] ON [PiecePositionModels] ([OwnerGuid]);
 GO
 
 CREATE INDEX [IX_PlayerModels_StatisticGuid] ON [PlayerModels] ([StatisticGuid]);
@@ -112,7 +112,7 @@ CREATE INDEX [IX_Users_UserId] ON [Users] ([UserId]);
 GO
 
 INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-VALUES (N'20240604203506_init', N'8.0.6');
+VALUES (N'20240605170508_init', N'8.0.6');
 GO
 
 COMMIT;

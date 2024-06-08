@@ -31,7 +31,9 @@ namespace HalmaServer.Models {
 
         [ForeignKey("GameGuid")]
         public GameModel Game { get; private set; }
+        
         [ForeignKey("PlayerGuid")]
+        public string OwnerGuid { get; set; }
         public PlayerModel Owner { get; private set; }
 
         public string GetGuid()

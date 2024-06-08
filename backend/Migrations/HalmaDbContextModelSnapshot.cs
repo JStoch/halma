@@ -58,7 +58,8 @@ namespace backend.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("PlayerGuid")
+                    b.Property<string>("OwnerGuid")
+                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<int>("X")
@@ -71,9 +72,9 @@ namespace backend.Migrations
 
                     b.HasIndex("GameGuid");
 
-                    b.HasIndex("PlayerGuid");
+                    b.HasIndex("OwnerGuid");
 
-                    b.ToTable("PiecePositionModel");
+                    b.ToTable("PiecePositionModels");
                 });
 
             modelBuilder.Entity("HalmaServer.Models.PlayerModel", b =>
@@ -232,7 +233,9 @@ namespace backend.Migrations
 
                     b.HasOne("HalmaServer.Models.PlayerModel", "Owner")
                         .WithMany()
-                        .HasForeignKey("PlayerGuid");
+                        .HasForeignKey("OwnerGuid")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Game");
 

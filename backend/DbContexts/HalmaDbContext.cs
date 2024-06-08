@@ -55,6 +55,11 @@ namespace HalmaWebApi.DbContexts
                .WithMany()
                .HasForeignKey(p => p.StatisticGuid);
 
+            modelBuilder.Entity<PiecePositionModel>()
+                .HasOne(p => p.Owner)
+                .WithMany()
+                .HasForeignKey(p => p.OwnerGuid);
+
             base.OnModelCreating(modelBuilder);
         }
     }

@@ -54,7 +54,7 @@
         "httpsPort": 8081,
         "publishAllPorts": true,
         "useSSL": true,
-        "DockerfileRunArguments": "--network=halma-network -itd --name=halma-web-api"
+        "DockerfileRunArguments": "--network=halma-network -itd --name=halma-web-api -p 5000:5000"
 
       }
     }

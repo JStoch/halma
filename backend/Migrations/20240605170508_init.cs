@@ -125,29 +125,30 @@ namespace backend.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "PiecePositionModel",
+                name: "PiecePositionModels",
                 columns: table => new
                 {
                     PieceId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     X = table.Column<int>(type: "int", nullable: false),
                     Y = table.Column<int>(type: "int", nullable: false),
                     GameGuid = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    PlayerGuid = table.Column<string>(type: "nvarchar(450)", nullable: true)
+                    OwnerGuid = table.Column<string>(type: "nvarchar(450)", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_PiecePositionModel", x => x.PieceId);
+                    table.PrimaryKey("PK_PiecePositionModels", x => x.PieceId);
                     table.ForeignKey(
-                        name: "FK_PiecePositionModel_Games_GameGuid",
+                        name: "FK_PiecePositionModels_Games_GameGuid",
                         column: x => x.GameGuid,
                         principalTable: "Games",
                         principalColumn: "GameGuid",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_PiecePositionModel_PlayerModels_PlayerGuid",
-                        column: x => x.PlayerGuid,
+                        name: "FK_PiecePositionModels_PlayerModels_OwnerGuid",
+                        column: x => x.OwnerGuid,
                         principalTable: "PlayerModels",
-                        principalColumn: "PlayerGuid");
+                        principalColumn: "PlayerGuid",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
@@ -166,14 +167,14 @@ namespace backend.Migrations
                 column: "GameModelGuid");
 
             migrationBuilder.CreateIndex(
-                name: "IX_PiecePositionModel_GameGuid",
-                table: "PiecePositionModel",
+                name: "IX_PiecePositionModels_GameGuid",
+                table: "PiecePositionModels",
                 column: "GameGuid");
 
             migrationBuilder.CreateIndex(
-                name: "IX_PiecePositionModel_PlayerGuid",
-                table: "PiecePositionModel",
-                column: "PlayerGuid");
+                name: "IX_PiecePositionModels_OwnerGuid",
+                table: "PiecePositionModels",
+                column: "OwnerGuid");
 
             migrationBuilder.CreateIndex(
                 name: "IX_PlayerModels_StatisticGuid",
@@ -198,7 +199,7 @@ namespace backend.Migrations
                 name: "GamesHistory");
 
             migrationBuilder.DropTable(
-                name: "PiecePositionModel");
+                name: "PiecePositionModels");
 
             migrationBuilder.DropTable(
                 name: "Games");
