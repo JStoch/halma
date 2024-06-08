@@ -99,7 +99,12 @@ namespace HalmaServer.Hubs
             }
         }
 
-        public async Task StopGame(string gameGuid, string playerGuid) {
+        public async Task StopGame(string? gameGuid, string playerGuid) {
+            if (gameGuid == null) {
+                GameService.RemoveFromQueue(playerGuid);
+                return;
+            }
+
             GameService.StopGame(gameGuid);
             var game = GameService.GetGame(gameGuid);
             var oponnent = game.GetOponnent(playerGuid);
