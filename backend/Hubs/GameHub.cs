@@ -64,6 +64,12 @@ namespace HalmaServer.Hubs
 
             await SyncGameState(Context.ConnectionId, game);
 
+            if (game.IsGameFinished())
+            {
+                await Clients.Caller.SendAsync("EndOfGame", game.DidPlayerWin(playerGuid));
+               BotService.ClearConnectionIfExist(Context.ConnectionId);
+            }
+
         }
 
         public async Task MakeMove(string gameGuid, string playerGuid, List<int> from, List<int> to) {

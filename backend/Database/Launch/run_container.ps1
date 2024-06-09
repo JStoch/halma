@@ -1,7 +1,19 @@
 ﻿cd ..
 
-# Create docker network if not exists
+$containerName = "mssql-server"
 
+# Check if the container exists
+if (docker ps -a --format "{{.Names}}" | Select-String -Pattern "^$containerName$" -Quiet) {
+    # Container exists, so remove it
+    docker rm -f $containerName
+    Write-Output "Container $containerName removed."
+}
+else {
+    Write-Output "Container $containerName does not exist."
+}
+
+
+# Create docker network if not exists
 if (-not (docker network ls | Select-String -Pattern "halma-network")) {
     echo "Creatig halma-network...";
     docker network create halma-network

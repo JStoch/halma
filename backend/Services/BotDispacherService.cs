@@ -99,6 +99,18 @@ namespace backend.Services
 
         }
 
+        public void ClearConnectionIfExist(string connectionKey)
+        {
+            if (CheckForConnectionExistance(connectionKey))
+            {
+                if(_botOponents.Remove(connectionKey))
+                    _currentBot = null;
+                
+                if(_innerHalmas.Remove(connectionKey));
+                 _currentHalma.Dispose();
+            }
+        }
+
         internal static Halma.Move ConvertPiecesToMove(List<int> from, List<int> to)
         {
             return new Halma.Move(new Halma.PawnCoord(from[0], from[1]), new Halma.PawnCoord(to[0], to[1]));
