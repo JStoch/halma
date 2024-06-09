@@ -118,3 +118,37 @@ GO
 COMMIT;
 GO
 
+BEGIN TRANSACTION;
+GO
+
+ALTER TABLE [PlayerModels] DROP CONSTRAINT [FK_PlayerModels_Statistics_StatisticGuid];
+GO
+
+DROP INDEX [IX_PlayerModels_StatisticGuid] ON [PlayerModels];
+GO
+
+DECLARE @var0 sysname;
+SELECT @var0 = [d].[name]
+FROM [sys].[default_constraints] [d]
+INNER JOIN [sys].[columns] [c] ON [d].[parent_column_id] = [c].[column_id] AND [d].[parent_object_id] = [c].[object_id]
+WHERE ([d].[parent_object_id] = OBJECT_ID(N'[PlayerModels]') AND [c].[name] = N'StatisticGuid');
+IF @var0 IS NOT NULL EXEC(N'ALTER TABLE [PlayerModels] DROP CONSTRAINT [' + @var0 + '];');
+ALTER TABLE [PlayerModels] DROP COLUMN [StatisticGuid];
+GO
+
+ALTER TABLE [Statistics] ADD [PlayerGuid] nvarchar(450) NOT NULL DEFAULT N'';
+GO
+
+CREATE INDEX [IX_Statistics_PlayerGuid] ON [Statistics] ([PlayerGuid]);
+GO
+
+ALTER TABLE [Statistics] ADD CONSTRAINT [FK_Statistics_PlayerModels_PlayerGuid] FOREIGN KEY ([PlayerGuid]) REFERENCES [PlayerModels] ([PlayerGuid]) ON DELETE CASCADE;
+GO
+
+INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+VALUES (N'20240609092127_change_ref_Statistic_PlayerModel', N'8.0.6');
+GO
+
+COMMIT;
+GO
+

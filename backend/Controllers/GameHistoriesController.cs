@@ -31,7 +31,7 @@ namespace backend.Controllers
         }
 
         // GET: api/GameHistories/5
-        [HttpGet("{id}")]
+        [HttpGet("{guid}")]
         public async Task<ActionResult<GameHistory>> GetGameHistory(string guid)
         {
             var gameHistory = await GameHistoryRepository.GetAsync(guid);
@@ -46,10 +46,10 @@ namespace backend.Controllers
 
         // PUT: api/GameHistories/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutGameHistory(string id, GameHistory gameHistory)
+        [HttpPut("{guid}")]
+        public async Task<IActionResult> PutGameHistory(string guid, GameHistory gameHistory)
         {
-            if (id != gameHistory.GameHistoryGuid)
+            if (guid != gameHistory.GameHistoryGuid)
             {
                 return BadRequest();
             }
@@ -62,7 +62,8 @@ namespace backend.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!GameHistoryExists(id))
+                bool ifExists = await GameHistoryExists(guid);
+                if (!ifExists)
                 {
                     return NotFound();
                 }
@@ -82,11 +83,11 @@ namespace backend.Controllers
         {
             await GameHistoryRepository.AddAsync(gameHistory);
             
-            return CreatedAtAction("GetGameHistory", new { id = gameHistory.GameHistoryGuid }, gameHistory);
+            return CreatedAtAction("GetGameHistory", new { guid = gameHistory.GameHistoryGuid }, gameHistory);
         }
 
         // DELETE: api/GameHistories/5
-        [HttpDelete("{id}")]
+        [HttpDelete("{guid}")]
         public async Task<IActionResult> DeleteGameHistory(string guid)
         {
             var gameHistory = await GameHistoryRepository.GetAsync(guid);
@@ -100,9 +101,9 @@ namespace backend.Controllers
             return NoContent();
         }
 
-        private bool GameHistoryExists(string guid)
+        private async  Task<bool> GameHistoryExists(string guid)
         {
-            return GameHistoryRepository.ContainsAsync(guid).Result;
+            return await GameHistoryRepository.ContainsAsync(guid);
         }
     }
 }

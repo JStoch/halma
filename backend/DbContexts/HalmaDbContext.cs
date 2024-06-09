@@ -20,11 +20,7 @@ namespace HalmaWebApi.DbContexts
         public DbSet<Statistic> Statistics { get; set; }
         public DbSet<GameHistory> GamesHistory { get; set; }
 
-        //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        //{
-        //    //optionsBuilder.UseLazyLoadingProxies();
-        //    base.OnConfiguring(optionsBuilder);
-        //}
+        
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -50,10 +46,10 @@ namespace HalmaWebApi.DbContexts
                 .OnDelete(DeleteBehavior.NoAction);
 
 
-            modelBuilder.Entity<PlayerModel>()
-               .HasOne(p => p.Statistic)
+            modelBuilder.Entity<Statistic>()
+               .HasOne(p => p.Owner)
                .WithMany()
-               .HasForeignKey(p => p.StatisticGuid);
+               .HasForeignKey(p => p.PlayerGuid);
 
             modelBuilder.Entity<PiecePositionModel>()
                 .HasOne(p => p.Owner)

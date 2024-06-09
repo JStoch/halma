@@ -1,10 +1,11 @@
 ﻿using backend.Repositories;
+using HalmaServer.Models;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace HalmaWebApi.Models
 {
-    public class Statistic : IGetGuid
+    public class Statistic : IGetGuid, IPlayerAccessible
     {
 
         public Statistic()
@@ -15,6 +16,11 @@ namespace HalmaWebApi.Models
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public string StatisticGuid { get; set; }
+
+        [ForeignKey("PlayerGuid")]
+        public string PlayerGuid { get; set; }
+
+        public PlayerModel Owner { get; set; }
 
         public int GamesPlayed { get; set; }
 
@@ -46,6 +52,11 @@ namespace HalmaWebApi.Models
         public string GetGuid()
         {
             return StatisticGuid;
+        }
+
+        public string GetPlayerGuid()
+        {
+            return this.PlayerGuid;
         }
     }
 }

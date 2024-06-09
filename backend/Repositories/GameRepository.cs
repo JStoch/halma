@@ -141,8 +141,10 @@ namespace backend.Repositories
             //If game has ended - update statistics
             if (!game.IsGameActive)
             {
-                Statistic player1Stats = game.Player1.Statistic == null ? new Statistic() : game.Player1.Statistic;
-                Statistic player2Stats = game.Player2.Statistic == null ? new Statistic() : game.Player2.Statistic;
+                Statistic player1Stats = Statistics.FindAsyncRefPlayer(s => s.Equals(game.Player1Guid)).Result ?? new Statistic() { PlayerGuid = game.Player1Guid }; 
+                Statistic player2Stats = Statistics.FindAsyncRefPlayer(s => s.Equals(game.Player2Guid)).Result ?? new Statistic() { PlayerGuid = game.Player2Guid };
+
+
 
                 if (game.DidPlayerWin(game.Player1.PlayerGuid))
                 {

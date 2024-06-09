@@ -1,4 +1,5 @@
 ﻿using HalmaWebApi.Models;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 
@@ -116,6 +117,11 @@ namespace backend.Repositories
         public async Task<bool> Any(Func<T1, bool> predicate)
         {
             return await Task.FromResult(_dbSet.Any(predicate));
+        }
+
+        internal async Task<T1> FindAsyncRefPlayer(Func<string,bool> predicate) 
+        {
+            return await _dbSet.Where(s => s is IPlayerAccessible && predicate((s as IPlayerAccessible).GetPlayerGuid())).FirstOrDefaultAsync();
         }
     }
 }

@@ -16,10 +16,6 @@ namespace HalmaServer.Models {
         [ForeignKey("UserGuid")]
         public User User { get; set;}
 
-        [ForeignKey("StatisticGuid")]
-        public string? StatisticGuid { get; set; }
-
-        public Statistic? Statistic { get; set; }
 
         public PlayerModel(string playerGuid, string connectionId) {
             PlayerGuid = playerGuid;

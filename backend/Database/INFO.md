@@ -37,7 +37,7 @@
 	update-database -Context HalmaDbContext // to update database with latest migration
 	Update-Database -Migration:0 -Context HalmaDbContext //to rollback all changes
 	```
-- Sooo EF decided to fuck me up (YES! I LOVE PAINFUL EXPERIENCES!). Here is another solution to performe migrations:
+- Sooo EF decided to stop working for normal migrations done by 'Update-Database' command. Here is another solution to perform migrations:
 	```code
 	Add-Migration -v init -Context HalmaDbContext
 	Script-Migration -v -Context HalmaDbContext -o ./backend/Database/database-scripts/migration.sql
@@ -46,5 +46,5 @@
 	Adjust the names of migration and context accordingly, and then finally run migration.sql manualy on the desired database :)
 	The '-v' flag is useful to see what's going on under the hood.
 
-- Clearing databases to reload data (id needed) is done by executing:
+- Clearing databases to reload data (if needed) is done by executing:
   .\Purging\purge.sql

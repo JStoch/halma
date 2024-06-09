@@ -91,9 +91,10 @@ namespace backend.Services
             _innerHalmas.Add(connectionKey, _currentHalma);
             _botOponents.Add(connectionKey, _currentBot);
 
-            //Info 
-            // - depth <= 6 - <1s for move
-            // - depth >= 10 - 1s for move
+            //Info:
+            // - depth < 10 - <1s for calc move
+            // - depth >= 10 - 1s for calc move
+            //Tweak at your own risk ;)
 
             _currentHalma.Init();
 
