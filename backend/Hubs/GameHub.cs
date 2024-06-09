@@ -36,7 +36,7 @@ namespace HalmaServer.Hubs
             }
         }
 
-        public async Task RequestNewGameWithBot(string playerGuid)
+        public async Task RequestNewGameWithBot(string playerGuid, DifficulityLevel difficulityLevel = DifficulityLevel.EASY)
         {
             var game = GameService.StartGameOrWait(playerGuid, Context.ConnectionId, requestBotOponent: true);
             if (game != null)
@@ -47,7 +47,7 @@ namespace HalmaServer.Hubs
 
                 // sync state for the start
                 await SyncGameState(Context.ConnectionId, game);
-                BotService.InitForNewConnection(Context.ConnectionId);
+                BotService.InitForNewConnection(Context.ConnectionId, level: difficulityLevel);
             }
             else
             {
