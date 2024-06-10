@@ -66,7 +66,7 @@ function compareArrays(arr1, arr2) {
 }
 
 const ip = "localhost";
-const port = 8080;
+const port = 5113;
 
 function Game() {
   const [pieces, setPieces] = useState({ player1: [], player2: [] });
@@ -96,7 +96,7 @@ function Game() {
     });
 
     connection.on("NewGame", (gameGuid, mySymbol) => {
-      console.log("asd");
+      clearInterval(interval);
       setLoading(false);
       setGameUid(gameGuid);
       setPlayer(mySymbol);
@@ -133,10 +133,6 @@ function Game() {
         return loadingTextArray[nextIndex];
       });
     }, 5000);
-
-    return () => {
-      clearInterval(interval);
-    };
   }, []);
 
   const validatePosition = (from, to, turn) => {
@@ -289,7 +285,16 @@ function Game() {
     if (!validatePosition(selectedPiece, selectedField, turn)) {
       setSelectedField(null);
       setSelectedPiece(null);
-      return;
+      return false;
+    }
+    if (
+      !getValidMoves(selectedPiece).some((arr) =>
+        compareArrays(arr, selectedField)
+      )
+    ) {
+      setSelectedField(null);
+      setSelectedPiece(null);
+      return false;
     }
 
     if (turn === 1) {
@@ -312,6 +317,7 @@ function Game() {
     connection.invoke("MakeMove", gameuid, uuid, selectedPiece, selectedField);
     setSelectedField(null);
     setSelectedPiece(null);
+    return true;
   };
 
   return (
@@ -338,6 +344,7 @@ function Game() {
           setSelectedPiece={setSelectedPiece}
           setSelectedField={setSelectedField}
           makeMove={makeMove}
+          getValidMoves={getValidMoves}
         />
       )}
     </div>

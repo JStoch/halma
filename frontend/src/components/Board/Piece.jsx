@@ -8,6 +8,9 @@ function Piece({
   piecePosition,
   setSelectedPiece,
   makeMove,
+  setHighlightedPiece,
+  highlighted,
+  shouldQuitHighlighting,
 }) {
   const pieceRef = useRef(null);
   const [pieceDragging, setPieceDragging] = useState(false);
@@ -20,10 +23,16 @@ function Piece({
     setDragging(true);
     setPieceDragging(true);
     setSelectedPiece(piecePosition);
+    setHighlightedPiece(piecePosition);
   };
 
   const onStop = () => {
-    makeMove();
+    if (shouldQuitHighlighting) {
+      setHighlightedPiece(null);
+    }
+    if (makeMove()) {
+      setHighlightedPiece(null);
+    }
     setPieceDragging(false);
     setDragging(false);
   };
