@@ -32,7 +32,9 @@ function Board({
   const reverseBoard = player === 2;
 
   const handleMouseLeave = () => {
-    setSelectedField(null);
+    if (setSelectedField) {
+      setSelectedField(null);
+    }
   };
 
   const handleSetHighlightedPiece = (newPiece) => {

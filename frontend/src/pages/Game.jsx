@@ -58,15 +58,13 @@ const loadingTextArray = [
   "Getting Your Opponents Ready...",
 ];
 
-const firstPlayer = 2;
-const secondPlayer = 1;
-
 function compareArrays(arr1, arr2) {
   return JSON.stringify(arr1) == JSON.stringify(arr2);
 }
 
-const ip = "localhost";
-const port = 5113;
+const apiUrl = import.meta.env.VITE_BACKEND_API;
+
+console.log(apiUrl);
 
 function Game() {
   const [pieces, setPieces] = useState({ player1: [], player2: [] });
@@ -77,7 +75,7 @@ function Game() {
   const [selectedField, setSelectedField] = useState(null);
   const [connection] = useState(
     new signalR.HubConnectionBuilder()
-      .withUrl(`http://${ip}:${port}/game`, {
+      .withUrl(`${apiUrl}/game`, {
         skipNegotiation: true,
         transport: signalR.HttpTransportType.WebSockets,
       })
