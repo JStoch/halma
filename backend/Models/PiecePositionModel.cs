@@ -1,11 +1,44 @@
+using backend.Repositories;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
 namespace HalmaServer.Models {
-    public class PiecePositionModel(int x, int y, GameModel game, PlayerModel owner)
+    public class PiecePositionModel : IGetGuid
     {
-        //TODO change for a generated key
-        public string PieceId {get; set;} = Guid.NewGuid().ToString();
-        public int X { get; set; } = x;
-        public int Y { get; set; } = y;
-        public GameModel Game { get; } = game;
-        public PlayerModel Owner { get; } = owner;
+        private PiecePositionModel(int x, int y)
+        {
+            PieceId = Guid.NewGuid().ToString();
+            X = x;
+            Y = y;
+        }
+
+        public static PiecePositionModel GetNewPiecePositionModel(int x , int y, GameModel game, PlayerModel owner)
+        {
+            var piecePosition = new PiecePositionModel(x,y)
+            {
+                Game = game,
+                Owner = owner
+            };
+
+            return piecePosition;
+        }
+
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public string PieceId {get; private set;}
+        public int X { get; set; }
+        public int Y { get; set; }
+
+        [ForeignKey("GameGuid")]
+        public GameModel Game { get; private set; }
+        
+        [ForeignKey("PlayerGuid")]
+        public string OwnerGuid { get; set; }
+        public PlayerModel Owner { get; private set; }
+
+        public string GetGuid()
+        {
+            return PieceId;
+        }
     }
 }

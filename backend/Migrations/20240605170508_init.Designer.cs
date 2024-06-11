@@ -4,6 +4,7 @@ using HalmaWebApi.DbContexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace backend.Migrations
 {
     [DbContext(typeof(HalmaDbContext))]
-    partial class HalmaDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240605170508_init")]
+    partial class init
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -87,10 +90,15 @@ namespace backend.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("StatisticGuid")
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<string>("UserGuid")
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("PlayerGuid");
+
+                    b.HasIndex("StatisticGuid");
 
                     b.HasIndex("UserGuid");
 
@@ -131,13 +139,7 @@ namespace backend.Migrations
                     b.Property<DateTime>("LastPlayedDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("PlayerGuid")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
                     b.HasKey("StatisticGuid");
-
-                    b.HasIndex("PlayerGuid");
 
                     b.ToTable("Statistics");
                 });
@@ -245,9 +247,15 @@ namespace backend.Migrations
 
             modelBuilder.Entity("HalmaServer.Models.PlayerModel", b =>
                 {
+                    b.HasOne("HalmaWebApi.Models.Statistic", "Statistic")
+                        .WithMany()
+                        .HasForeignKey("StatisticGuid");
+
                     b.HasOne("HalmaWebApi.Models.User", "User")
                         .WithMany()
                         .HasForeignKey("UserGuid");
+
+                    b.Navigation("Statistic");
 
                     b.Navigation("User");
                 });
@@ -259,17 +267,6 @@ namespace backend.Migrations
                         .HasForeignKey("GameModelGuid");
 
                     b.Navigation("GameModel");
-                });
-
-            modelBuilder.Entity("HalmaWebApi.Models.Statistic", b =>
-                {
-                    b.HasOne("HalmaServer.Models.PlayerModel", "Owner")
-                        .WithMany()
-                        .HasForeignKey("PlayerGuid")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Owner");
                 });
 
             modelBuilder.Entity("HalmaWebApi.Models.User", b =>
