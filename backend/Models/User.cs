@@ -12,7 +12,7 @@ namespace HalmaWebApi.Models
     public class User : IdentityUser, IGetGuid
     {
         [NotMapped]
-        public string? Guid { get { return Id; } private set { } }
+        public string Guid { get { return Id; } set { } }
 
         public bool IsLoggedIn { get; set; }
 

@@ -58,7 +58,7 @@ namespace backend.Repositories
 
         public Task<T1> Get(string guid)
         {
-            return _dbSet.FirstOrDefaultAsync(e => e.GetGuid().Equals(guid));
+            return _dbSet.FirstOrDefaultAsync(e => e.Guid.Equals(guid));
         }
 
         public virtual async Task<IEnumerable<T1>> GetAllAsync()
@@ -91,7 +91,7 @@ namespace backend.Repositories
 
         public async Task<bool> ContainsAsync(string guid)
         {
-            return await _dbSet.AnyAsync(e => e.GetGuid().Equals(guid));
+            return await _dbSet.AnyAsync(e => e.Guid.Equals(guid));
         }
 
         public async Task<bool> ContainsAsync(T1 entity)
@@ -121,7 +121,7 @@ namespace backend.Repositories
 
         internal async Task<T1> FindAsyncRefPlayer(Func<string,bool> predicate) 
         {
-            return await _dbSet.Where(s => s is IPlayerAccessible && predicate((s as IPlayerAccessible).GetPlayerGuid())).FirstOrDefaultAsync();
+            return await _dbSet.Where(s => s is IPlayerAccessible && predicate((s as IPlayerAccessible).PlayerGuid)).FirstOrDefaultAsync();
         }
     }
 }

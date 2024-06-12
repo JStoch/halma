@@ -54,7 +54,7 @@ namespace HalmaServer.Services
             {
                 opponent = WaitingCustomGamePool[0];
                 WaitingCustomGamePool.Remove(opponent);
-                Logger.LogInformation("Player {PlayerGuid} matched with opponent {OpponentGuid}.", playerGuid, opponent.PlayerGuid);
+                Logger.LogInformation("Player {PlayerGuid} matched with opponent {OpponentGuid}.", playerGuid, opponent.Guid);
             }
             else
             {
@@ -64,7 +64,7 @@ namespace HalmaServer.Services
 
             var game = GameModel.GetGameModel(player, opponent);
             Repository.AddGame(game);
-            Logger.LogInformation("Game created with ID {GameGuid} between player {PlayerGuid} and opponent {OpponentGuid}.", game.GameGuid, playerGuid, opponent.PlayerGuid);
+            Logger.LogInformation("Game created with ID {GameGuid} between player {PlayerGuid} and opponent {OpponentGuid}.", game.Guid, playerGuid, opponent.Guid);
             return game;
         }
 
@@ -104,13 +104,13 @@ namespace HalmaServer.Services
             var prevY = from[1];
             var piece = game.Pieces.FirstOrDefault(movedPiece => movedPiece.X == prevX && movedPiece.Y == prevY);
 
-            if (piece == null || piece.Owner.PlayerGuid != playerGuid)
+            if (piece == null || piece.Owner.Guid != playerGuid)
             {
                 Logger.LogWarning("Invalid piece or ownership for player {PlayerGuid} in game {GameGuid}.", playerGuid, gameGuid);
                 return false;
             }
 
-            Repository.UpdatePiecePosition(piece.PieceId, to[0], to[1], game.GameGuid);
+            Repository.UpdatePiecePosition(piece.Guid, to[0], to[1], game.Guid);
             game.NextMove();
             Repository.UpdateGameState(game);
             Logger.LogInformation("Move successful for player {PlayerGuid} in game {GameGuid}.", playerGuid, gameGuid);

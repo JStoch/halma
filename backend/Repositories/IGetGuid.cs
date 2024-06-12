@@ -2,6 +2,6 @@
 {
     public interface IGetGuid
     {
-        string GetGuid();
+        public string Guid { get; set; }
     }
 }

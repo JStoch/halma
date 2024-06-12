@@ -12,21 +12,6 @@ namespace backend.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "Statistics",
-                columns: table => new
-                {
-                    StatisticGuid = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    GamesPlayed = table.Column<int>(type: "int", nullable: false),
-                    GamesWon = table.Column<int>(type: "int", nullable: false),
-                    AvgWinRate = table.Column<double>(type: "float", nullable: false),
-                    LastPlayedDate = table.Column<DateTime>(type: "datetime2", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Statistics", x => x.StatisticGuid);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Users",
                 columns: table => new
                 {
@@ -63,19 +48,13 @@ namespace backend.Migrations
                 name: "PlayerModels",
                 columns: table => new
                 {
-                    PlayerGuid = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Guid = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     ConnectionId = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    UserGuid = table.Column<string>(type: "nvarchar(450)", nullable: true),
-                    StatisticGuid = table.Column<string>(type: "nvarchar(450)", nullable: true)
+                    UserGuid = table.Column<string>(type: "nvarchar(450)", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_PlayerModels", x => x.PlayerGuid);
-                    table.ForeignKey(
-                        name: "FK_PlayerModels_Statistics_StatisticGuid",
-                        column: x => x.StatisticGuid,
-                        principalTable: "Statistics",
-                        principalColumn: "StatisticGuid");
+                    table.PrimaryKey("PK_PlayerModels", x => x.Guid);
                     table.ForeignKey(
                         name: "FK_PlayerModels_Users_UserGuid",
                         column: x => x.UserGuid,
@@ -87,48 +66,70 @@ namespace backend.Migrations
                 name: "Games",
                 columns: table => new
                 {
-                    GameGuid = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Guid = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     Player1Guid = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     Player2Guid = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     IsGameActive = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Games", x => x.GameGuid);
+                    table.PrimaryKey("PK_Games", x => x.Guid);
                     table.ForeignKey(
                         name: "FK_Games_PlayerModels_Player1Guid",
                         column: x => x.Player1Guid,
                         principalTable: "PlayerModels",
-                        principalColumn: "PlayerGuid");
+                        principalColumn: "Guid");
                     table.ForeignKey(
                         name: "FK_Games_PlayerModels_Player2Guid",
                         column: x => x.Player2Guid,
                         principalTable: "PlayerModels",
-                        principalColumn: "PlayerGuid");
+                        principalColumn: "Guid");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Statistics",
+                columns: table => new
+                {
+                    Guid = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    PlayerGuid = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    GamesPlayed = table.Column<int>(type: "int", nullable: false),
+                    GamesWon = table.Column<int>(type: "int", nullable: false),
+                    AvgWinRate = table.Column<double>(type: "float", nullable: false),
+                    LastPlayedDate = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Statistics", x => x.Guid);
+                    table.ForeignKey(
+                        name: "FK_Statistics_PlayerModels_PlayerGuid",
+                        column: x => x.PlayerGuid,
+                        principalTable: "PlayerModels",
+                        principalColumn: "Guid",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
                 name: "GamesHistory",
                 columns: table => new
                 {
-                    GameHistoryGuid = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Guid = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     GameModelGuid = table.Column<string>(type: "nvarchar(450)", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_GamesHistory", x => x.GameHistoryGuid);
+                    table.PrimaryKey("PK_GamesHistory", x => x.Guid);
                     table.ForeignKey(
                         name: "FK_GamesHistory_Games_GameModelGuid",
                         column: x => x.GameModelGuid,
                         principalTable: "Games",
-                        principalColumn: "GameGuid");
+                        principalColumn: "Guid");
                 });
 
             migrationBuilder.CreateTable(
                 name: "PiecePositionModels",
                 columns: table => new
                 {
-                    PieceId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Guid = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     X = table.Column<int>(type: "int", nullable: false),
                     Y = table.Column<int>(type: "int", nullable: false),
                     GameGuid = table.Column<string>(type: "nvarchar(450)", nullable: false),
@@ -136,18 +137,18 @@ namespace backend.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_PiecePositionModels", x => x.PieceId);
+                    table.PrimaryKey("PK_PiecePositionModels", x => x.Guid);
                     table.ForeignKey(
                         name: "FK_PiecePositionModels_Games_GameGuid",
                         column: x => x.GameGuid,
                         principalTable: "Games",
-                        principalColumn: "GameGuid",
+                        principalColumn: "Guid",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_PiecePositionModels_PlayerModels_OwnerGuid",
                         column: x => x.OwnerGuid,
                         principalTable: "PlayerModels",
-                        principalColumn: "PlayerGuid",
+                        principalColumn: "Guid",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -177,14 +178,14 @@ namespace backend.Migrations
                 column: "OwnerGuid");
 
             migrationBuilder.CreateIndex(
-                name: "IX_PlayerModels_StatisticGuid",
-                table: "PlayerModels",
-                column: "StatisticGuid");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_PlayerModels_UserGuid",
                 table: "PlayerModels",
                 column: "UserGuid");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Statistics_PlayerGuid",
+                table: "Statistics",
+                column: "PlayerGuid");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Users_UserId",
@@ -202,13 +203,13 @@ namespace backend.Migrations
                 name: "PiecePositionModels");
 
             migrationBuilder.DropTable(
+                name: "Statistics");
+
+            migrationBuilder.DropTable(
                 name: "Games");
 
             migrationBuilder.DropTable(
                 name: "PlayerModels");
-
-            migrationBuilder.DropTable(
-                name: "Statistics");
 
             migrationBuilder.DropTable(
                 name: "Users");

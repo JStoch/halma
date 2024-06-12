@@ -9,7 +9,7 @@ namespace HalmaWebApi.Models
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public string GameHistoryGuid { get; set; }
+        public string Guid { get; set; }
 
 
         [ForeignKey("GameModelGuid")]
@@ -17,12 +17,8 @@ namespace HalmaWebApi.Models
 
         public GameHistory()
         {
-            GameHistoryGuid = Guid.NewGuid().ToString();
+            Guid = System.Guid.NewGuid().ToString();
         }
 
-        public string GetGuid()
-        {
-            return GameHistoryGuid;
-        }
     }
 }

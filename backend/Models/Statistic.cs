@@ -10,12 +10,12 @@ namespace HalmaWebApi.Models
 
         public Statistic()
         {
-            StatisticGuid = Guid.NewGuid().ToString();
+            Guid = System.Guid.NewGuid().ToString();
         }
 
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public string StatisticGuid { get; set; }
+        public string Guid { get; set; }
 
         [ForeignKey("PlayerGuid")]
         public string PlayerGuid { get; set; }
@@ -51,7 +51,7 @@ namespace HalmaWebApi.Models
 
         public string GetGuid()
         {
-            return StatisticGuid;
+            return Guid;
         }
 
         public string GetPlayerGuid()

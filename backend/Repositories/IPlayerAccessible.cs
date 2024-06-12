@@ -2,6 +2,6 @@
 {
     public interface IPlayerAccessible
     {
-        string GetPlayerGuid();
+        public string PlayerGuid { get; set; }
     }
 }

@@ -73,14 +73,16 @@ function Game() {
   const [dragging, setDragging] = useState(false);
   const [selectedPiece, setSelectedPiece] = useState(null);
   const [selectedField, setSelectedField] = useState(null);
+  const newUrl = `http://localhost:5000/game`;
   const [connection] = useState(
     new signalR.HubConnectionBuilder()
-      .withUrl(`http://localhost:8080/game`, { //${apiUrl}
+      .withUrl(newUrl, { //${apiUrl}
         skipNegotiation: true,
         transport: signalR.HttpTransportType.WebSockets,
       })
       .build()
   );
+  console.log(newUrl);
   const [uuid] = useState(uuidv4());
   const [gameuid, setGameUid] = useState(null);
   const [loading, setLoading] = useState(true);

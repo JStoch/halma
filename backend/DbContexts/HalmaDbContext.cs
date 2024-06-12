@@ -26,11 +26,11 @@ namespace HalmaWebApi.DbContexts
         {
             // Configure GameModel entity
             modelBuilder.Entity<GameModel>()
-                .HasKey(g => g.GameGuid);
+                .HasKey(g => g.Guid);
 
             // Configure GamesHistoryModel entity
             modelBuilder.Entity<GameHistory>()
-                        .HasKey(gh => gh.GameHistoryGuid);
+                        .HasKey(gh => gh.Guid);
 
 
             modelBuilder.Entity<GameModel>()

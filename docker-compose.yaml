@@ -10,8 +10,8 @@ services:
       - halma-network
     image: halma-frontend-setup
     ports:
-      - 8081:80
-      - 5000:5000
+      - 8082:80
+      #- 5000:5000
 
   mssql-server: 
     build: 
@@ -20,8 +20,8 @@ services:
     networks: 
       - halma-network
     image: mssql-setup
-    ports:
-      - "1443:1443"
+    # ports:
+    #   - "1443:1443"
   
   halma-web-api: # problem with building in docker-compose, proceed to release / run manually!
     build: 

@@ -19,9 +19,11 @@ namespace AppStart
 {
     internal class Program
     {
-        public static void Main(string[] args)
+        public static int Main(string[] args)
         {
             CreateHostBuilder(args).Build().Run();
+
+            return 0;
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
@@ -34,10 +36,11 @@ namespace AppStart
                        {
                            //listenOptions.UseConnectionHandler<?>()
                            //listenOptions.UseHttps(); // Use HTTPS for port 5000
+                           listenOptions.UseHub<GameHub>();
+
                        });
                        serverOptions.ListenAnyIP(8080, listenOptions =>
                        {
-                           listenOptions.UseHub<GameHub>();
                            // listenOptions.UseHttps(); // Use HTTPS for port 8080
                        });
                        serverOptions.ListenAnyIP(8081, listenOptions =>

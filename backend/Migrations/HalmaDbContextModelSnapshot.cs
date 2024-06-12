@@ -24,7 +24,7 @@ namespace backend.Migrations
 
             modelBuilder.Entity("HalmaServer.Models.GameModel", b =>
                 {
-                    b.Property<string>("GameGuid")
+                    b.Property<string>("Guid")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("nvarchar(450)");
 
@@ -39,7 +39,7 @@ namespace backend.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
-                    b.HasKey("GameGuid");
+                    b.HasKey("Guid");
 
                     b.HasIndex("Player1Guid");
 
@@ -50,7 +50,7 @@ namespace backend.Migrations
 
             modelBuilder.Entity("HalmaServer.Models.PiecePositionModel", b =>
                 {
-                    b.Property<string>("PieceId")
+                    b.Property<string>("Guid")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("nvarchar(450)");
 
@@ -68,7 +68,7 @@ namespace backend.Migrations
                     b.Property<int>("Y")
                         .HasColumnType("int");
 
-                    b.HasKey("PieceId");
+                    b.HasKey("Guid");
 
                     b.HasIndex("GameGuid");
 
@@ -79,7 +79,7 @@ namespace backend.Migrations
 
             modelBuilder.Entity("HalmaServer.Models.PlayerModel", b =>
                 {
-                    b.Property<string>("PlayerGuid")
+                    b.Property<string>("Guid")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("nvarchar(450)");
 
@@ -90,7 +90,7 @@ namespace backend.Migrations
                     b.Property<string>("UserGuid")
                         .HasColumnType("nvarchar(450)");
 
-                    b.HasKey("PlayerGuid");
+                    b.HasKey("Guid");
 
                     b.HasIndex("UserGuid");
 
@@ -99,14 +99,14 @@ namespace backend.Migrations
 
             modelBuilder.Entity("HalmaWebApi.Models.GameHistory", b =>
                 {
-                    b.Property<string>("GameHistoryGuid")
+                    b.Property<string>("Guid")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("GameModelGuid")
                         .HasColumnType("nvarchar(450)");
 
-                    b.HasKey("GameHistoryGuid");
+                    b.HasKey("Guid");
 
                     b.HasIndex("GameModelGuid");
 
@@ -115,7 +115,7 @@ namespace backend.Migrations
 
             modelBuilder.Entity("HalmaWebApi.Models.Statistic", b =>
                 {
-                    b.Property<string>("StatisticGuid")
+                    b.Property<string>("Guid")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("nvarchar(450)");
 
@@ -135,7 +135,7 @@ namespace backend.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
-                    b.HasKey("StatisticGuid");
+                    b.HasKey("Guid");
 
                     b.HasIndex("PlayerGuid");
 

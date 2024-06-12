@@ -146,7 +146,7 @@ namespace backend.Repositories
 
 
 
-                if (game.DidPlayerWin(game.Player1.PlayerGuid))
+                if (game.DidPlayerWin(game.Player1.Guid))
                 {
                     player1Stats.UpdateWin();
                     player2Stats.UpdateLoss();

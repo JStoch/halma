@@ -12,7 +12,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace backend.Controllers
 {
-    [Authorize]
+    //[Authorize] //Uncoment to provide authorization to asset
     [Route("api/[controller]")]
     [ApiController]
     public class GameHistoriesController : ControllerBase
@@ -51,7 +51,7 @@ namespace backend.Controllers
         [HttpPut("{guid}")]
         public async Task<IActionResult> PutGameHistory(string guid, GameHistory gameHistory)
         {
-            if (guid != gameHistory.GameHistoryGuid)
+            if (guid != gameHistory.Guid)
             {
                 return BadRequest();
             }
@@ -85,7 +85,7 @@ namespace backend.Controllers
         {
             await GameHistoryRepository.AddAsync(gameHistory);
             
-            return CreatedAtAction("GetGameHistory", new { guid = gameHistory.GameHistoryGuid }, gameHistory);
+            return CreatedAtAction("GetGameHistory", new { guid = gameHistory.Guid }, gameHistory);
         }
 
         // DELETE: api/GameHistories/5

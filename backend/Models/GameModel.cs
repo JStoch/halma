@@ -9,7 +9,7 @@ namespace HalmaServer.Models {
 
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public string GameGuid {get; set;}
+        public string Guid {get; set;}
         
         [ForeignKey("Player1Guid")]
         public string Player1Guid { get; set;}
@@ -81,7 +81,7 @@ namespace HalmaServer.Models {
         private GameModel() 
         {
 
-            GameGuid = Guid.NewGuid().ToString();
+            Guid = System.Guid.NewGuid().ToString();
             Player1Turn = true;
             DidPlayer1Win = null;
             IsGameActive = true;
@@ -105,7 +105,7 @@ namespace HalmaServer.Models {
         }
 
         public PlayerModel GetPlayer(string playerGuid) {
-            if (Player1.PlayerGuid == playerGuid) {
+            if (Player1.Guid == playerGuid) {
                 return Player1;
             } else {
                 return Player2;
@@ -113,7 +113,7 @@ namespace HalmaServer.Models {
         }
 
         public PlayerModel GetOponnent(string playerGuid) {
-            if (Player1.PlayerGuid != playerGuid) {
+            if (Player1.Guid != playerGuid) {
                 return Player1;
             } else {
                 return Player2;
@@ -121,7 +121,7 @@ namespace HalmaServer.Models {
         }
 
         public bool CanPlayerMove(string playerGuid) {
-            return (Player1.PlayerGuid == playerGuid) == Player1Turn;
+            return (Player1.Guid == playerGuid) == Player1Turn;
         }
 
         public int GetActivePlayerSymbol() {
@@ -133,7 +133,7 @@ namespace HalmaServer.Models {
         }
 
         public int GetPlayerSymbol(string playerGuid) {
-            if (Player1.PlayerGuid == playerGuid) {
+            if (Player1.Guid == playerGuid) {
                 return P1SYMBOL;
             } else {
                 return P2SYMBOL;
@@ -145,13 +145,13 @@ namespace HalmaServer.Models {
         }
 
         public bool DidPlayerWin(string playerGuid) {
-            return Player1.PlayerGuid == playerGuid == DidPlayer1Win;
+            return Player1.Guid == playerGuid == DidPlayer1Win;
         }
 
         public List<List<int>> GetPlayerPieces(bool forPlayer1) {
-            var playerGuid = forPlayer1 ? Player1.PlayerGuid : Player2.PlayerGuid;
+            var playerGuid = forPlayer1 ? Player1.Guid : Player2.Guid;
             return (from piece in Pieces
-                where piece.Owner.PlayerGuid == playerGuid
+                where piece.Owner.Guid == playerGuid
                 select new List<int>{ piece.X, piece.Y }).ToList();
         }
 
@@ -178,17 +178,17 @@ namespace HalmaServer.Models {
         public override bool Equals(object? obj)
         {
             return obj is GameModel model &&
-                   GameGuid == model.GameGuid;
+                   Guid == model.Guid;
         }
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(GameGuid);
+            return HashCode.Combine(Guid);
         }
 
         public string GetGuid()
         {
-            return GameGuid;
+            return Guid;
         }
     }
 }

@@ -12,7 +12,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace backend.Controllers
 {
-    [Authorize]
+    //[Authorize] //Uncoment to provide authorization to asset
     [ApiController]
     [Route("api/[controller]")]
     
@@ -66,7 +66,7 @@ namespace backend.Controllers
         [HttpPut("{guid}")]
         public async Task<IActionResult> PutStatistic(string guid, Statistic statistic)
         {
-            if (guid != statistic.StatisticGuid)
+            if (guid != statistic.Guid)
             {
                 return BadRequest();
             }
@@ -100,7 +100,7 @@ namespace backend.Controllers
         {
             await _repository.Add(statistic);
 
-            return CreatedAtAction("GetStatistic", new { id = statistic.StatisticGuid }, statistic);
+            return CreatedAtAction("GetStatistic", new { id = statistic.Guid }, statistic);
         }
 
         // DELETE: api/Statistics/5
@@ -120,7 +120,7 @@ namespace backend.Controllers
 
         private async Task<bool> StatisticExists(string guid)
         {
-            return await _repository.Any(e => e.StatisticGuid.Equals(guid));
+            return await _repository.Any(e => e.Guid.Equals(guid));
         }
     }
 }

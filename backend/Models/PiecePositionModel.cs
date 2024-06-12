@@ -7,7 +7,7 @@ namespace HalmaServer.Models {
     {
         private PiecePositionModel(int x, int y)
         {
-            PieceId = Guid.NewGuid().ToString();
+            Guid = System.Guid.NewGuid().ToString();
             X = x;
             Y = y;
         }
@@ -25,7 +25,7 @@ namespace HalmaServer.Models {
 
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public string PieceId {get; private set;}
+        public string Guid {get;  set;}
         public int X { get; set; }
         public int Y { get; set; }
 
@@ -38,7 +38,7 @@ namespace HalmaServer.Models {
 
         public string GetGuid()
         {
-            return PieceId;
+            return Guid;
         }
     }
 }
