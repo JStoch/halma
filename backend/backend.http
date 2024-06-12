@@ -4,4 +4,4 @@ Accept: application/json
 
 ###
 
-GET {{HalmaWebApi_HostAddress}}/game
+GET http://localhost:8082/game

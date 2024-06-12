@@ -8,11 +8,14 @@ using Microsoft.EntityFrameworkCore;
 using HalmaWebApi.DbContexts;
 using HalmaWebApi.Models;
 using backend.Repositories;
+using Microsoft.AspNetCore.Authorization;
 
 namespace backend.Controllers
 {
-    [Route("api/[controller]")]
+    [Authorize]
     [ApiController]
+    [Route("api/[controller]")]
+    
     public class StatisticsController : ControllerBase
     {
         private readonly AsyncRepository<Statistic, HalmaDbContext> _repository;
@@ -45,7 +48,7 @@ namespace backend.Controllers
 
 
         // GET: api/Statistics/5
-        [HttpGet("{guid}")]
+        [Microsoft.AspNetCore.Mvc.HttpGet("{guid}")]
         public async Task<ActionResult<Statistic>> GetStatistic(string guid)
         {
             var statistic = await _repository.GetAsync(guid);

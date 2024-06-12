@@ -2,11 +2,13 @@
 using backend.Services;
 using HalmaServer.Models;
 using HalmaServer.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 using Mono.TextTemplating;
 
 namespace HalmaServer.Hubs
 {
+    [Authorize]
     public class GameHub: Hub {
 
         private GameService GameService { get; set; }

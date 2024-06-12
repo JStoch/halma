@@ -8,9 +8,11 @@ using Microsoft.EntityFrameworkCore;
 using HalmaWebApi.DbContexts;
 using HalmaWebApi.Models;
 using backend.Repositories;
+using Microsoft.AspNetCore.Authorization;
 
 namespace backend.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class GameHistoriesController : ControllerBase

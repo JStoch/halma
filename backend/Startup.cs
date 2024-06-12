@@ -5,7 +5,9 @@ using HalmaServer.Models;
 using HalmaServer.Services;
 using HalmaWebApi.DbContexts;
 using HalmaWebApi.Models;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 
 namespace backend
 {
@@ -32,6 +34,26 @@ namespace backend
                 typeof(PlayerModel),
                 typeof(PiecePositionModel)
             };
+
+            services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+            .AddJwtBearer(options =>
+            {
+                options.Authority = "https://accounts.google.com";
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidAudience = Configuration["Authentication:Google:ClientId"]
+                };
+            })
+            .AddGoogle(options =>
+            {
+                options.ClientId = Configuration["Authentication:Google:ClientId"];
+                options.ClientSecret = Configuration["Authentication:Google:ClientSecret"];
+                options.CallbackPath = "/signin-google";
+            });
 
             var halmaDbConnString = Configuration.GetConnectionString("HalmaDbConn");
             services.AddDbContext<HalmaDbContext>(opt =>
@@ -76,6 +98,10 @@ namespace backend
             app.UseHttpsRedirection();
 
             app.UseRouting();
+
+            app.UseAuthentication();
+            app.UseAuthorization();
+            
 
             app.UseEndpoints(endpoints =>
             {

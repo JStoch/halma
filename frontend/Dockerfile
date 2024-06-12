@@ -1,6 +1,6 @@
 FROM node:20 AS build
 
-ARG BACKEND_API=halma-web-api:8080
+ARG BACKEND_API=localhost:8080
 ENV VITE_BACKEND_API=$BACKEND_API
 
 WORKDIR /app
