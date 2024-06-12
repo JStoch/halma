@@ -75,7 +75,7 @@ function Game() {
   const [selectedField, setSelectedField] = useState(null);
   const [connection] = useState(
     new signalR.HubConnectionBuilder()
-      .withUrl(`${apiUrl}/game`, {
+      .withUrl(`http://localhost:8080/game`, { //${apiUrl}
         skipNegotiation: true,
         transport: signalR.HttpTransportType.WebSockets,
       })

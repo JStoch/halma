@@ -1,6 +1,4 @@
-﻿cd ..
-
-$containerName = "mssql-server"
+$containerName = "halma-frontend"
 
 # Check if the container exists
 if (docker ps -a --format "{{.Names}}" | Select-String -Pattern "^$containerName$" -Quiet) {
@@ -20,7 +18,7 @@ if (-not (docker network ls | Select-String -Pattern "halma-network")) {
 }
 
 # Build MSSQL database setup image
-docker build -t mssql-setup -f ./Dockerfile .
+docker build -t halma-frontend-setup -f ./Dockerfile .
 
-# Run MSSQL database setup container -p 1433:1433
-docker run -d --name mssql-server --hostname mssql-server  --network halma-network -v mssql_data:/var/opt/mssql mssql-setup
+# Run MSSQL database setup container 
+docker run -d --name halma-frontend --network halma-network --hostname halma-frontend -p 8082:80  halma-frontend-setup

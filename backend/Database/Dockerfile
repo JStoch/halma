@@ -23,8 +23,6 @@ RUN chmod +x /entrypoint.sh
 # Expose the SQL Server port
 EXPOSE 1433
 
-
-
 # Add a volume to persist data
 VOLUME /var/opt/mssql
 

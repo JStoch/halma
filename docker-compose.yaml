@@ -1,0 +1,50 @@
+version: "3.8"
+services:
+  halma-frontend:
+    build:
+      args:
+        - VITE_BACKEND_API=http://localhost:8080
+      context: ./frontend
+      dockerfile: Dockerfile
+    networks: 
+      - halma-network
+    image: halma-frontend-setup
+    ports:
+      - 8081:80
+      - 5000:5000
+
+  mssql-server: 
+    build: 
+      context: ./backend/Database
+      dockerfile: Dockerfile
+    networks: 
+      - halma-network
+    image: mssql-setup
+    ports:
+      - "1443:1443"
+  
+  halma-web-api: # problem with building in docker-compose, proceed to release / run manually!
+    build: 
+      context: ./backend
+      dockerfile: Dockerfile
+      args:
+        - ASPNETCORE_HTTPS_PORTS=8081
+        - ASPNETCORE_HTTP_PORTS=8080
+    command: ["dotnet", "backend.dll"]
+    image: backend
+    ports:
+    - "5000:5000"
+    - "8080:8080"
+    - "8081:8081"
+    networks:
+      - halma-network
+    volumes:
+      - .:/app
+    depends_on:
+      - mssql-server
+    restart: always
+
+networks:
+  halma-network:
+    driver: bridge
+
