@@ -1,33 +1,93 @@
 import Button from "../Button";
+import { googleLogout, useGoogleLogin } from "@react-oauth/google";
+import { useEffect } from "react";
+import axios from "axios";
 
-function Sidebar() {
+function Sidebar({ profile, user, setProfile, setUser }) {
+  const login = useGoogleLogin({
+    onSuccess: (codeResponse) => {
+      setUser(codeResponse);
+      localStorage.setItem("user", JSON.stringify(codeResponse));
+    },
+    onError: (error) => console.log("Login Failed:", error),
+  });
+
+  const logOut = () => {
+    googleLogout();
+    setProfile(null);
+    setUser(null);
+    localStorage.removeItem("user");
+  };
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
+    }
+  }, []);
+
+  useEffect(() => {
+    if (user) {
+      axios
+        .get(
+          `https://www.googleapis.com/oauth2/v1/userinfo?access_token=${user.access_token}`,
+          {
+            headers: {
+              Authorization: `Bearer ${user.access_token}`,
+              Accept: "application/json",
+            },
+          }
+        )
+        .then((res) => {
+          setProfile(res.data);
+        })
+        .catch((err) => console.log(err));
+    }
+  }, [user]);
+
   return (
     <div className="bg-neutral-800 px-6 py-6 w-60 shadow-2xl flex flex-col">
-      <div className="space-y-2">
-        <img
-          src="https://images.unsplash.com/photo-1628157588553-5eeea00af15c?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=880&q=80"
-          alt="Avatar user"
-          className="w-20 rounded-full mx-auto"
-        />
-        <div>
-          <h2 className="font-medium text-base text-center text-white">
-            @example_user50
-          </h2>
-          <p className="text-sm text-platinum text-center">1250🔥</p>
-        </div>
-      </div>
-      <div className="mt-auto space-y-3">
-        {/* <Button
+      {profile ? (
+        <>
+          <div className="space-y-2">
+            <img
+              src={profile.picture}
+              alt="Avatar user"
+              className="w-20 rounded-full mx-auto"
+            />
+            <div>
+              <h2 className="font-medium text-base text-center text-white">
+                {profile.name}
+              </h2>
+            </div>
+          </div>
+          <div className="mt-auto space-y-3">
+            {/* <Button
           value="Friends"
           className="bg-platinum hover:bg-platinum-light"
         /> */}
-        <Button value="Ranks" className="bg-platinum hover:bg-platinum-light" />
+            <Button
+              value="Ranks"
+              className="bg-platinum hover:bg-platinum-light"
+            />
+            <Button
+              value="History"
+              className="bg-platinum hover:bg-platinum-light"
+            />
+            <Button
+              value="Logout"
+              onClick={logOut}
+              className="bg-red-500 hover:bg-red-400"
+            />
+          </div>
+        </>
+      ) : (
         <Button
-          value="History"
-          className="bg-platinum hover:bg-platinum-light"
+          className="bg-google hover:bg-google-light mt-auto"
+          value="Sign in with Google"
+          onClick={login}
         />
-        <Button value="Logout" className="bg-red-500 hover:bg-red-400" />
-      </div>
+      )}
     </div>
   );
 }

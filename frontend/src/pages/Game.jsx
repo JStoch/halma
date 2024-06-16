@@ -4,6 +4,8 @@ import * as signalR from "@microsoft/signalr";
 import { v4 as uuidv4 } from "uuid";
 import Button from "../components/Button";
 import Loading from "../components/Loading";
+import EndGamePopup from "../components/EndGamePopup";
+import { useNavigate } from "react-router-dom";
 
 const staticPieces = {
   player1: [
@@ -58,9 +60,6 @@ const loadingTextArray = [
   "Getting Your Opponents Ready...",
 ];
 
-const firstPlayer = 2;
-const secondPlayer = 1;
-
 function compareArrays(arr1, arr2) {
   return JSON.stringify(arr1) == JSON.stringify(arr2);
 }
@@ -86,10 +85,21 @@ function Game() {
   const [uuid] = useState(uuidv4());
   const [gameuid, setGameUid] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [result, setResult] = useState(null);
   const [loadingText, setLoadingText] = useState(loadingTextArray[0]);
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     setPieces(staticPieces);
+
+    const interval = setInterval(() => {
+      setLoadingText((prevText) => {
+        const currentIndex = loadingTextArray.indexOf(prevText);
+        const nextIndex = (currentIndex + 1) % loadingTextArray.length;
+        return loadingTextArray[nextIndex];
+      });
+    }, 5000);
 
     connection.on("WaitingForGame", () => {
       //TODO react accordingly
@@ -111,12 +121,15 @@ function Game() {
     });
 
     connection.on("EndOfGame", (didIWin) => {
+      setResult(didIWin ? "win" : "lose");
+      setTurn(0);
       // TODO handle end of game (someone won)
       // WARNING this might be sent multiple times, but only once with "didIWin" param (not sure why)
       // let me know if it's a problem
     });
 
     connection.on("GameStopped", () => {
+      console.log("Other player has quit");
       // TODO this message means that the other player exited the game
       // the exiting player should use connection.invoke("StopGame", gameGuid, playerGuid)
     });
@@ -125,15 +138,12 @@ function Game() {
       setLoading(true);
       connection.invoke("RequestNewGame", uuid);
     });
-
-    const interval = setInterval(() => {
-      setLoadingText((prevText) => {
-        const currentIndex = loadingTextArray.indexOf(prevText);
-        const nextIndex = (currentIndex + 1) % loadingTextArray.length;
-        return loadingTextArray[nextIndex];
-      });
-    }, 5000);
   }, []);
+
+  const handleExitGame = () => {
+    connection.invoke("StopGame", gameuid, uuid);
+    navigate("/");
+  };
 
   const validatePosition = (from, to, turn) => {
     // check if target is on board
@@ -334,18 +344,31 @@ function Game() {
           />
         </div>
       ) : (
-        <Board
-          className="h-6/7"
-          pieces={pieces}
-          player={player}
-          turn={turn}
-          dragging={dragging}
-          setDragging={setDragging}
-          setSelectedPiece={setSelectedPiece}
-          setSelectedField={setSelectedField}
-          makeMove={makeMove}
-          getValidMoves={getValidMoves}
-        />
+        <>
+          {result == null ? null : (
+            <EndGamePopup result={result}></EndGamePopup>
+          )}
+          <div className="flex-1 flex h-6/7 flex-col justify-end">
+            <Button
+              value="Exit"
+              className="bg-red-500 hover:bg-red-400 mx-24"
+              onClick={handleExitGame}
+            ></Button>
+          </div>
+          <Board
+            className="h-6/7"
+            pieces={pieces}
+            player={player}
+            turn={turn}
+            dragging={dragging}
+            setDragging={setDragging}
+            setSelectedPiece={setSelectedPiece}
+            setSelectedField={setSelectedField}
+            makeMove={makeMove}
+            getValidMoves={getValidMoves}
+          />
+          <div className="flex-1 h-6/7"></div>
+        </>
       )}
     </div>
   );

@@ -24,6 +24,7 @@ function Board({
   makeMove,
   pieces = { player1: [], player2: [] },
   getValidMoves,
+  disable = false,
 }) {
   const [highlightedPiece, setHighlightedPiece] = useState(null);
   const [shouldQuitHighlighting, setShouldQuitHighlighting] = useState(false);
@@ -32,7 +33,9 @@ function Board({
   const reverseBoard = player === 2;
 
   const handleMouseLeave = () => {
-    setSelectedField(null);
+    if (!disable) {
+      setSelectedField(null);
+    }
   };
 
   const handleSetHighlightedPiece = (newPiece) => {

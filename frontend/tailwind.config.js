@@ -20,6 +20,10 @@ export default {
         lg: "0 8px 16px var(--tw-shadow-color)",
       },
       colors: {
+        google: {
+          light: "#5591F5",
+          DEFAULT: "#4285F4",
+        },
         jet: "#353535",
         caribbean: "#3C6E71",
         platinum: {
