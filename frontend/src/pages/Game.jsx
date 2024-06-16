@@ -67,7 +67,7 @@ function compareArrays(arr1, arr2) {
 const ip = "localhost";
 const port = 5113;
 
-function Game() {
+function Game({ profile }) {
   const [pieces, setPieces] = useState({ player1: [], player2: [] });
   const [player, setPlayer] = useState(0);
   const [turn, setTurn] = useState(0);
@@ -82,13 +82,15 @@ function Game() {
       })
       .build()
   );
-  const [uuid] = useState(uuidv4());
+  // const [uuid] = useState(uuidv4());
   const [gameuid, setGameUid] = useState(null);
   const [loading, setLoading] = useState(true);
   const [result, setResult] = useState(null);
   const [loadingText, setLoadingText] = useState(loadingTextArray[0]);
 
   const navigate = useNavigate();
+
+  const uuid = profile.id;
 
   useEffect(() => {
     setPieces(staticPieces);
