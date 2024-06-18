@@ -54,6 +54,7 @@ function Sidebar({ profile, user, setProfile, setUser }) {
               src={profile.picture}
               alt="Avatar user"
               className="w-20 rounded-full mx-auto"
+              referrerPolicy="no-referrer"
             />
             <div>
               <h2 className="font-medium text-base text-center text-white">
