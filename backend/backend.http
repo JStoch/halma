@@ -1,5 +1,7 @@
 @HalmaWebApi_HostAddress = http://localhost:5000
-GET {{HalmaWebApi_HostAddress}}/Users
+GET {{HalmaWebApi_HostAddress}}/api/GameHistories
 Accept: application/json
 
 ###
+
+GET http://localhost:5000/game

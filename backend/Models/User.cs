@@ -1,4 +1,5 @@
-﻿using HalmaWebApi.Filters;
+﻿using backend.Repositories;
+using HalmaWebApi.Filters;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
@@ -8,21 +9,22 @@ using System.Runtime.CompilerServices;
 namespace HalmaWebApi.Models
 {
     [ValidateModel]
-    public class User : IdentityUser
+    public class User : IdentityUser, IGetGuid
     {
-        
-        public string? Guid { get { return Id; } private set { } }
+        [NotMapped]
+        public string Guid { get { return Id; } set { } }
 
         public bool IsLoggedIn { get; set; }
 
         public DateTime RegistrationDate { get; set; }
 
-        [ForeignKey("Statistic")]
-        public int? StatisticId { get; set; }
-
-        [ForeignKey("StatisticId")]
-        public virtual Statistic? Statistic { get; set; }
+        
 
         public virtual ICollection<User>? FriendsList { get; set; }
+
+        public string GetGuid()
+        {
+            return Id;
+        }
     }
 }

@@ -1,7 +1,24 @@
+using backend.Repositories;
+using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
 namespace HalmaServer.Models {
-    public class GameModel {
-        public string GameGuid {get; set;}
+    
+    public class GameModel : IGetGuid {
+
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public string Guid {get; set;}
+        
+        [ForeignKey("Player1Guid")]
+        public string Player1Guid { get; set;}
+
         public PlayerModel Player1 {get; set;}
+        
+        [ForeignKey("Player2Guid")]
+        public string Player2Guid { get; set; }
+
         public PlayerModel Player2 {get; set;}
         public List<PiecePositionModel> Pieces {get;}
         public bool IsGameActive {get; set;}
@@ -9,6 +26,7 @@ namespace HalmaServer.Models {
         private bool Player1Turn {get; set;}
         private bool? DidPlayer1Win {get; set;}
 
+        [NotMapped]
         private List<(int, int)> P1Zone = [
             (0, 0),
             (0, 1),
@@ -31,6 +49,7 @@ namespace HalmaServer.Models {
             (4, 1)
         ];
 
+        [NotMapped]
         private List<(int, int)> P2Zone = [
             (15, 11),
             (15, 12),
@@ -54,24 +73,39 @@ namespace HalmaServer.Models {
         ];
 
         // map values to match player's pawns position in the client app
+        [NotMapped]
         const int P1SYMBOL = 2;
+        [NotMapped]
         const int P2SYMBOL = 1;
 
-        public GameModel(PlayerModel player1, PlayerModel player2) {
-            GameGuid = Guid.NewGuid().ToString();
-            Player1 = player1;
-            Player2 = player2;
+        private GameModel() 
+        {
+
+            Guid = System.Guid.NewGuid().ToString();
             Player1Turn = true;
             DidPlayer1Win = null;
             IsGameActive = true;
-
             Pieces = [];
-            P1Zone.ForEach( pieceCoord => Pieces.Add(new PiecePositionModel(pieceCoord.Item1, pieceCoord.Item2, this, player1)));
-            P2Zone.ForEach( pieceCoord => Pieces.Add(new PiecePositionModel(pieceCoord.Item1, pieceCoord.Item2, this, player2)));
+
+        }
+
+        public static GameModel GetGameModel(PlayerModel player1, PlayerModel player2)
+        {
+            var gameModel = new GameModel()
+            {
+                Player1 = player1,
+                Player2 = player2
+                
+            };
+
+            gameModel.P1Zone.ForEach(pieceCoord => gameModel.Pieces.Add(PiecePositionModel.GetNewPiecePositionModel(pieceCoord.Item1, pieceCoord.Item2, gameModel, player1)));
+            gameModel.P2Zone.ForEach(pieceCoord => gameModel.Pieces.Add(PiecePositionModel.GetNewPiecePositionModel(pieceCoord.Item1, pieceCoord.Item2, gameModel, player2)));
+
+            return gameModel;
         }
 
         public PlayerModel GetPlayer(string playerGuid) {
-            if (Player1.PlayerGuid == playerGuid) {
+            if (Player1.Guid == playerGuid) {
                 return Player1;
             } else {
                 return Player2;
@@ -79,7 +113,7 @@ namespace HalmaServer.Models {
         }
 
         public PlayerModel GetOponnent(string playerGuid) {
-            if (Player1.PlayerGuid != playerGuid) {
+            if (Player1.Guid != playerGuid) {
                 return Player1;
             } else {
                 return Player2;
@@ -87,7 +121,7 @@ namespace HalmaServer.Models {
         }
 
         public bool CanPlayerMove(string playerGuid) {
-            return Player1.PlayerGuid == playerGuid == Player1Turn;
+            return (Player1.Guid == playerGuid) == Player1Turn;
         }
 
         public int GetActivePlayerSymbol() {
@@ -99,7 +133,7 @@ namespace HalmaServer.Models {
         }
 
         public int GetPlayerSymbol(string playerGuid) {
-            if (Player1.PlayerGuid == playerGuid) {
+            if (Player1.Guid == playerGuid) {
                 return P1SYMBOL;
             } else {
                 return P2SYMBOL;
@@ -111,13 +145,13 @@ namespace HalmaServer.Models {
         }
 
         public bool DidPlayerWin(string playerGuid) {
-            return Player1.PlayerGuid == playerGuid == DidPlayer1Win;
+            return Player1.Guid == playerGuid == DidPlayer1Win;
         }
 
         public List<List<int>> GetPlayerPieces(bool forPlayer1) {
-            var playerGuid = forPlayer1 ? Player1.PlayerGuid : Player2.PlayerGuid;
+            var playerGuid = forPlayer1 ? Player1.Guid : Player2.Guid;
             return (from piece in Pieces
-                where piece.Owner.PlayerGuid == playerGuid
+                where piece.Owner.Guid == playerGuid
                 select new List<int>{ piece.X, piece.Y }).ToList();
         }
 
@@ -135,10 +169,26 @@ namespace HalmaServer.Models {
 
             if (hasPlayerWon) {
                 DidPlayer1Win = Player1Turn;
-                IsGameActive = true;
+                IsGameActive = false;
             }
 
             Player1Turn = !Player1Turn;
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return obj is GameModel model &&
+                   Guid == model.Guid;
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(Guid);
+        }
+
+        public string GetGuid()
+        {
+            return Guid;
         }
     }
 }
